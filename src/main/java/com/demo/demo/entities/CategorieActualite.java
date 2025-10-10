@@ -1,0 +1,5 @@
+package com.demo.demo.entities;
+
+public enum CategorieActualite {
+    CRYPTO_MONNAIES, MARCHES_FINANCIERS,INNOVATION_FINTECH,ANALYSE_FONDAMENTALE,PSYCHOLOGIE_DU_TRADER
+}
