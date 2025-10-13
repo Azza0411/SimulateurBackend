@@ -28,6 +28,8 @@ private typeT typeT;
     private float gainPerte;
     private Date dateCreation;
     private Date dateExecution;
+    @Enumerated(EnumType.STRING)
+    private ModeValidation modeValidation;
     // 🔹 Relation Many-to-One vers Simulation
     @ManyToOne
     @JoinColumn(name = "simulation_id")

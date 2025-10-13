@@ -14,7 +14,10 @@ public class Lesson {
     private int id;
     private String title;
     private String description;
+    @Column(name = "image")
     private String image;
+    @Column(name = "video")
+    private String video;
     @Enumerated(EnumType.STRING)
 
     private typeLesson typeLesson;
@@ -22,7 +25,7 @@ public class Lesson {
     private int ordreLesson;
     @ManyToOne
     @JoinColumn(name = "module_id")
-    private Module module;
+    private CoursModule module;
     @OneToMany(mappedBy = "lesson", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Quiz> quizzes;
 
@@ -40,6 +43,30 @@ public class Lesson {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getVideo() {
+        return video;
+    }
+
+    public void setVideo(String video) {
+        this.video = video;
+    }
+
+    public CoursModule getModule() {
+        return module;
+    }
+
+    public void setModule(CoursModule module) {
+        this.module = module;
+    }
+
+    public List<Quiz> getQuizzes() {
+        return quizzes;
+    }
+
+    public void setQuizzes(List<Quiz> quizzes) {
+        this.quizzes = quizzes;
     }
 
     public String getDescription() {

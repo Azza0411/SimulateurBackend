@@ -69,6 +69,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
         String method = request.getMethod();
 
         // Chemins qui ne nécessitent PAS d'authentification JWT
+
         return path.startsWith("/api/auth/") ||
                 path.startsWith("/swagger-ui") ||
                 path.startsWith("/v3/api-docs") ||
@@ -76,6 +77,8 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
                 path.startsWith("/webjars") ||
                 path.startsWith("/configuration") ||
                 path.equals("/v3/api-docs") ||
+                path.startsWith("/api/cours-modules") ||
+               // path.startsWith("/api/cours-modules/") ||// ← Ajouté pour ignorer le filtre sur modules (CRUD)
                 path.equals("/swagger-ui.html") ||
                 path.equals("/swagger-ui/index.html") ||
                 path.equals("/swagger-config") ||

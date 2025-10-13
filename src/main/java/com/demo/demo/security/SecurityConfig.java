@@ -50,12 +50,16 @@ public class SecurityConfig {
                     ).permitAll()
                     // API Auth - Accès public
                     .requestMatchers("/api/auth/**").permitAll()
+                    .requestMatchers("/api/cours-modules/**").permitAll()  // ← Ajouté ici pour autoriser /api/cours-modules sans auth
                     ////////////////hibaaa//////////////
                     .requestMatchers("/user/**").permitAll()  // ← TOUS LES ENDPOINTS USER
                     .requestMatchers("/test/**").permitAll()  // ← ENDPOINTS TEST
                     .requestMatchers("/user/updateuser/**").authenticated()            // Modif besoin auth
                     .requestMatchers("/user/delete/**").authenticated()                // Suppression besoin auth
                     .requestMatchers("/user/saveall", "/user/addwithconfpassword", "/user/addWTUN").authenticated()
+                    .requestMatchers("/api/cours-modules").authenticated()
+                    .requestMatchers("/api/cours-modules/").authenticated()
+
 
 
 
@@ -66,7 +70,7 @@ public class SecurityConfig {
                     .anyRequest().authenticated())
     ;
 
-    http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+   http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
   }

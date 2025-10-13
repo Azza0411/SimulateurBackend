@@ -34,6 +34,8 @@ public class UserEntity {
     private int cin ;
     private int telephone;
     private int age;
+    @Column(name = "image")
+    private String image;
     @Enumerated(EnumType.STRING)
 
     private niveau niveau;
@@ -48,11 +50,11 @@ private badge badge;
     // 🔹 Relation Many-to-Many avec Module
     @ManyToMany
     @JoinTable(
-            name = "user_module",
+            name = "user_Cours_Module",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "module_id")
     )
-    private Set<Module> modules = new HashSet<>();
+    private Set<CoursModule> modules= new HashSet<>();
 
     //  Invitations envoyées (OneToMany)
     @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -164,10 +166,69 @@ private badge badge;
         this.role = role;
     }
 
+    public String getImage() {
+        return image;
+    }
 
+    public void setImage(String image) {
+        this.image = image;
+    }
 
+    public Set<CoursModule> getModules() {
+        return modules;
+    }
 
+    public void setModules(Set<CoursModule> modules) {
+        modules = modules;
+    }
 
+    public List<Invitation> getInvitationsEnvoyees() {
+        return invitationsEnvoyees;
+    }
+
+    public void setInvitationsEnvoyees(List<Invitation> invitationsEnvoyees) {
+        this.invitationsEnvoyees = invitationsEnvoyees;
+    }
+
+    public List<Invitation> getInvitationsRecues() {
+        return invitationsRecues;
+    }
+
+    public void setInvitationsRecues(List<Invitation> invitationsRecues) {
+        this.invitationsRecues = invitationsRecues;
+    }
+
+    public Portefeuille getPortefeuilleIndividuel() {
+        return portefeuilleIndividuel;
+    }
+
+    public void setPortefeuilleIndividuel(Portefeuille portefeuilleIndividuel) {
+        this.portefeuilleIndividuel = portefeuilleIndividuel;
+    }
+
+    public Set<Portefeuille> getPortefeuillesPartages() {
+        return portefeuillesPartages;
+    }
+
+    public void setPortefeuillesPartages(Set<Portefeuille> portefeuillesPartages) {
+        this.portefeuillesPartages = portefeuillesPartages;
+    }
+
+    public Set<Actualite> getActualitesConsultees() {
+        return actualitesConsultees;
+    }
+
+    public void setActualitesConsultees(Set<Actualite> actualitesConsultees) {
+        this.actualitesConsultees = actualitesConsultees;
+    }
+
+    public Set<Simulation> getSimulationsParticipees() {
+        return simulationsParticipees;
+    }
+
+    public void setSimulationsParticipees(Set<Simulation> simulationsParticipees) {
+        this.simulationsParticipees = simulationsParticipees;
+    }
 
     public Date getDateInscription() {
         return dateInscription;
