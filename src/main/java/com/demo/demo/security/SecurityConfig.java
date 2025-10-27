@@ -86,6 +86,8 @@ public class SecurityConfig {
                     .requestMatchers(HttpMethod.GET, "/api/actifs/**").permitAll()  // Get all et by ID
                     .requestMatchers(HttpMethod.PUT, "/api/actifs/**").permitAll()  // Update
                     .requestMatchers(HttpMethod.DELETE, "/api/actifs/**").permitAll()  // Delete
+                    // FIX : Explicit pour /analyse (GET /api/simulations/{id}/analyse) - Public sans auth
+                    .requestMatchers(HttpMethod.GET, "/api/simulations/*/analyse").permitAll()
 
 
 

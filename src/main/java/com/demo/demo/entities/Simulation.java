@@ -6,6 +6,7 @@ import lombok.Data;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -19,6 +20,7 @@ public class Simulation {
     private int id;
     @Enumerated(EnumType.STRING)
 private typeSimulation typeSimulation;
+    private Date datePrediction;
     private String description;
     private Duration duration;
     @Enumerated(EnumType.STRING)
@@ -44,7 +46,18 @@ private regleSimulation regleSimulation ;
     @Enumerated(EnumType.STRING)
 
     private StatutSimulation statutSimulation;
-    ;
+    //@Transient
+    //private String forexSignalsJson;  // JSON signals pour sim
+    // Nouveaux attributs pour IA en temps réel
+    @Column(name = "ia_adversaire_active")
+    private Boolean iaAdversaireActive = false; // Activé en MONO
+    @Column(name = "dernier_trade_ia", columnDefinition = "TEXT")
+    private String dernierTradeIa; // Stocke dernier move IA (JSON)
+    @Column(name = "score_ia_vs_user")
+    private Float scoreIaVsUser = 0.0f; // Score duel (P&L IA - user)
+    // AJOUT CORRECTION : Champ pour JSON dashboard forex (équiv. export Python, TEXT pour gros JSON)
+    @Column(name = "analyse_resultats", columnDefinition = "TEXT")
+    private String analyseResultats;
     // 🔹 Many-to-Many avec UserEntity
     @ManyToMany(mappedBy = "simulationsParticipees")
     private Set<UserEntity> users = new HashSet<>();
@@ -93,6 +106,30 @@ private regleSimulation regleSimulation ;
         this.dateDebut = dateDebut;
     }
 
+    public Boolean getIaAdversaireActive() {
+        return iaAdversaireActive;
+    }
+
+    public void setIaAdversaireActive(Boolean iaAdversaireActive) {
+        this.iaAdversaireActive = iaAdversaireActive;
+    }
+
+    public String getDernierTradeIa() {
+        return dernierTradeIa;
+    }
+
+    public void setDernierTradeIa(String dernierTradeIa) {
+        this.dernierTradeIa = dernierTradeIa;
+    }
+
+    public Float getScoreIaVsUser() {
+        return scoreIaVsUser;
+    }
+
+    public void setScoreIaVsUser(Float scoreIaVsUser) {
+        this.scoreIaVsUser = scoreIaVsUser;
+    }
+
     public LocalDateTime getDateFin() {
         return dateFin;
     }
@@ -124,6 +161,16 @@ private regleSimulation regleSimulation ;
     public void setFacteurTempsEcoule(Float facteurTempsEcoule) {
         this.facteurTempsEcoule = facteurTempsEcoule;
     }
+
+    public Date getDatePrediction() {
+        return datePrediction;
+    }
+
+    public void setDatePrediction(Date datePrediction) {
+        this.datePrediction = datePrediction;
+    }
+
+   
 
     public Float getCapitalActuel() {
         return capitalActuel;
@@ -231,5 +278,13 @@ private regleSimulation regleSimulation ;
 
     public void setModeSimulation(com.demo.demo.entities.ModeSimulation modeSimulation) {
         ModeSimulation = modeSimulation;
+    }
+
+    public String getAnalyseResultats() {
+        return analyseResultats;
+    }
+
+    public void setAnalyseResultats(String analyseResultats) {
+        this.analyseResultats = analyseResultats;
     }
 }

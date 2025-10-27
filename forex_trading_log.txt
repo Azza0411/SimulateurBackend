@@ -1,0 +1,657 @@
+2025-10-27T20:37:02.850+01:00  INFO 8756 --- [demo] [main] com.demo.demo.DemoApplication            : Starting DemoApplication using Java 23.0.1 with PID 8756 (C:\Users\Hibas\Downloads\simulateur\SimulateurBackend-principal\target\classes started by Hibas in C:\Users\Hibas\Downloads\simulateur\SimulateurBackend-principal)
+2025-10-27T20:37:02.851+01:00  INFO 8756 --- [demo] [main] com.demo.demo.DemoApplication            : No active profile set, falling back to 1 default profile: "default"
+2025-10-27T20:37:03.488+01:00  INFO 8756 --- [demo] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-10-27T20:37:03.550+01:00  INFO 8756 --- [demo] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 56 ms. Found 7 JPA repository interfaces.
+2025-10-27T20:37:03.976+01:00  INFO 8756 --- [demo] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8082 (http)
+2025-10-27T20:37:03.993+01:00  INFO 8756 --- [demo] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-10-27T20:37:03.994+01:00  INFO 8756 --- [demo] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.39]
+2025-10-27T20:37:04.039+01:00  INFO 8756 --- [demo] [main] o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring embedded WebApplicationContext
+2025-10-27T20:37:04.039+01:00  INFO 8756 --- [demo] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1153 ms
+2025-10-27T20:37:04.142+01:00  INFO 8756 --- [demo] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-10-27T20:37:04.191+01:00  INFO 8756 --- [demo] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.11.Final
+2025-10-27T20:37:04.223+01:00  INFO 8756 --- [demo] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-10-27T20:37:04.431+01:00  INFO 8756 --- [demo] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-10-27T20:37:04.455+01:00  INFO 8756 --- [demo] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-10-27T20:37:04.577+01:00  INFO 8756 --- [demo] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@457692cb
+2025-10-27T20:37:04.580+01:00  INFO 8756 --- [demo] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-10-27T20:37:04.597+01:00  WARN 8756 --- [demo] [main] org.hibernate.orm.deprecation            : HHH90000025: MySQL8Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-10-27T20:37:04.598+01:00  WARN 8756 --- [demo] [main] org.hibernate.orm.deprecation            : HHH90000026: MySQL8Dialect has been deprecated; use org.hibernate.dialect.MySQLDialect instead
+2025-10-27T20:37:04.611+01:00  INFO 8756 --- [demo] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 8.0
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-10-27T20:37:05.526+01:00  INFO 8756 --- [demo] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-10-27T20:37:05.911+01:00  INFO 8756 --- [demo] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-10-27T20:37:06.148+01:00  INFO 8756 --- [demo] [main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-10-27T20:37:06.681+01:00  INFO 8756 --- [demo] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name custoUserDetailsService
+2025-10-27T20:37:06.941+01:00  WARN 8756 --- [demo] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-10-27T20:37:07.405+01:00  INFO 8756 --- [demo] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8082 (http) with context path '/api'
+2025-10-27T20:37:07.412+01:00  INFO 8756 --- [demo] [main] com.demo.demo.DemoApplication            : Started DemoApplication in 4.938 seconds (process running for 5.579)
+2025-10-27T21:25:12.460+01:00  INFO 8756 --- [demo] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-10-27T21:25:12.479+01:00  INFO 8756 --- [demo] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-10-27T21:25:12.498+01:00  INFO 8756 --- [demo] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-10-27T21:25:12.518+01:00  INFO 8756 --- [demo] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-10-27T21:25:12.526+01:00  INFO 8756 --- [demo] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2025-10-27T21:31:38.478+01:00  INFO 29504 --- [demo] [main] com.demo.demo.DemoApplication            : Starting DemoApplication using Java 23.0.1 with PID 29504 (C:\Users\Hibas\Downloads\simulateur\SimulateurBackend-principal\target\classes started by Hibas in C:\Users\Hibas\Downloads\simulateur\SimulateurBackend-principal)
+2025-10-27T21:31:38.480+01:00  INFO 29504 --- [demo] [main] com.demo.demo.DemoApplication            : No active profile set, falling back to 1 default profile: "default"
+2025-10-27T21:31:39.152+01:00  INFO 29504 --- [demo] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-10-27T21:31:39.210+01:00  INFO 29504 --- [demo] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 51 ms. Found 7 JPA repository interfaces.
+2025-10-27T21:31:39.597+01:00  INFO 29504 --- [demo] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8082 (http)
+2025-10-27T21:31:39.608+01:00  INFO 29504 --- [demo] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-10-27T21:31:39.609+01:00  INFO 29504 --- [demo] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.39]
+2025-10-27T21:31:39.650+01:00  INFO 29504 --- [demo] [main] o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring embedded WebApplicationContext
+2025-10-27T21:31:39.650+01:00  INFO 29504 --- [demo] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1127 ms
+2025-10-27T21:31:39.758+01:00  INFO 29504 --- [demo] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-10-27T21:31:39.805+01:00  INFO 29504 --- [demo] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.11.Final
+2025-10-27T21:31:39.837+01:00  INFO 29504 --- [demo] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-10-27T21:31:40.034+01:00  INFO 29504 --- [demo] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-10-27T21:31:40.057+01:00  INFO 29504 --- [demo] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-10-27T21:31:40.176+01:00  INFO 29504 --- [demo] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@7717b4a0
+2025-10-27T21:31:40.177+01:00  INFO 29504 --- [demo] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-10-27T21:31:40.201+01:00  WARN 29504 --- [demo] [main] org.hibernate.orm.deprecation            : HHH90000025: MySQL8Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-10-27T21:31:40.202+01:00  WARN 29504 --- [demo] [main] org.hibernate.orm.deprecation            : HHH90000026: MySQL8Dialect has been deprecated; use org.hibernate.dialect.MySQLDialect instead
+2025-10-27T21:31:40.215+01:00  INFO 29504 --- [demo] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 8.0
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-10-27T21:31:41.104+01:00  INFO 29504 --- [demo] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-10-27T21:31:41.285+01:00  INFO 29504 --- [demo] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-10-27T21:31:41.517+01:00  INFO 29504 --- [demo] [main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-10-27T21:31:42.062+01:00  INFO 29504 --- [demo] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name custoUserDetailsService
+2025-10-27T21:31:42.219+01:00  WARN 29504 --- [demo] [main] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'simulationController': Unsatisfied dependency expressed through field 'simulationService': Error creating bean with name 'simulationServiceImpl': Injection of autowired dependencies failed
+2025-10-27T21:31:42.220+01:00  INFO 29504 --- [demo] [main] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-10-27T21:31:42.222+01:00  INFO 29504 --- [demo] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-10-27T21:31:42.227+01:00  INFO 29504 --- [demo] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2025-10-27T21:31:42.228+01:00  INFO 29504 --- [demo] [main] o.apache.catalina.core.StandardService   : Stopping service [Tomcat]
+2025-10-27T21:31:42.238+01:00  INFO 29504 --- [demo] [main] .s.b.a.l.ConditionEvaluationReportLogger : 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2025-10-27T21:31:42.248+01:00 ERROR 29504 --- [demo] [main] o.s.boot.SpringApplication               : Application run failed
+
+org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'simulationController': Unsatisfied dependency expressed through field 'simulationService': Error creating bean with name 'simulationServiceImpl': Injection of autowired dependencies failed
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.resolveFieldValue(AutowiredAnnotationBeanPostProcessor.java:788) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:768) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.annotation.InjectionMetadata.inject(InjectionMetadata.java:146) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessProperties(AutowiredAnnotationBeanPostProcessor.java:509) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1445) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:600) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:523) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:347) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.instantiateSingleton(DefaultListableBeanFactory.java:1155) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingleton(DefaultListableBeanFactory.java:1121) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:1056) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:987) ~[spring-context-6.2.5.jar:6.2.5]
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:627) ~[spring-context-6.2.5.jar:6.2.5]
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146) ~[spring-boot-3.4.4.jar:3.4.4]
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:752) ~[spring-boot-3.4.4.jar:3.4.4]
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439) ~[spring-boot-3.4.4.jar:3.4.4]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:318) ~[spring-boot-3.4.4.jar:3.4.4]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1361) ~[spring-boot-3.4.4.jar:3.4.4]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1350) ~[spring-boot-3.4.4.jar:3.4.4]
+	at com.demo.demo.DemoApplication.main(DemoApplication.java:13) ~[classes/:na]
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'simulationServiceImpl': Injection of autowired dependencies failed
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessProperties(AutowiredAnnotationBeanPostProcessor.java:515) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1445) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:600) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:523) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:347) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:254) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1667) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1555) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.resolveFieldValue(AutowiredAnnotationBeanPostProcessor.java:785) ~[spring-beans-6.2.5.jar:6.2.5]
+	... 22 common frames omitted
+Caused by: org.springframework.util.PlaceholderResolutionException: Could not resolve placeholder 'app.trading.export.dir' in value "${app.trading.export.dir}"
+	at org.springframework.util.PlaceholderResolutionException.withValue(PlaceholderResolutionException.java:81) ~[spring-core-6.2.5.jar:6.2.5]
+	at org.springframework.util.PlaceholderParser$ParsedValue.resolve(PlaceholderParser.java:423) ~[spring-core-6.2.5.jar:6.2.5]
+	at org.springframework.util.PlaceholderParser.replacePlaceholders(PlaceholderParser.java:128) ~[spring-core-6.2.5.jar:6.2.5]
+	at org.springframework.util.PropertyPlaceholderHelper.parseStringValue(PropertyPlaceholderHelper.java:118) ~[spring-core-6.2.5.jar:6.2.5]
+	at org.springframework.util.PropertyPlaceholderHelper.replacePlaceholders(PropertyPlaceholderHelper.java:114) ~[spring-core-6.2.5.jar:6.2.5]
+	at org.springframework.core.env.AbstractPropertyResolver.doResolvePlaceholders(AbstractPropertyResolver.java:255) ~[spring-core-6.2.5.jar:6.2.5]
+	at org.springframework.core.env.AbstractPropertyResolver.resolveRequiredPlaceholders(AbstractPropertyResolver.java:226) ~[spring-core-6.2.5.jar:6.2.5]
+	at org.springframework.context.support.PropertySourcesPlaceholderConfigurer.lambda$processProperties$0(PropertySourcesPlaceholderConfigurer.java:201) ~[spring-context-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.resolveEmbeddedValue(AbstractBeanFactory.java:971) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1577) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1555) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.resolveFieldValue(AutowiredAnnotationBeanPostProcessor.java:785) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:768) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.annotation.InjectionMetadata.inject(InjectionMetadata.java:146) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessProperties(AutowiredAnnotationBeanPostProcessor.java:509) ~[spring-beans-6.2.5.jar:6.2.5]
+	... 33 common frames omitted
+
+2025-10-27T21:34:37.253+01:00  INFO 27704 --- [demo] [main] com.demo.demo.DemoApplication            : Starting DemoApplication using Java 23.0.1 with PID 27704 (C:\Users\Hibas\Downloads\simulateur\SimulateurBackend-principal\target\classes started by Hibas in C:\Users\Hibas\Downloads\simulateur\SimulateurBackend-principal)
+2025-10-27T21:34:37.254+01:00  INFO 27704 --- [demo] [main] com.demo.demo.DemoApplication            : No active profile set, falling back to 1 default profile: "default"
+2025-10-27T21:34:37.862+01:00  INFO 27704 --- [demo] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-10-27T21:34:37.918+01:00  INFO 27704 --- [demo] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 50 ms. Found 7 JPA repository interfaces.
+2025-10-27T21:34:38.275+01:00  INFO 27704 --- [demo] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8082 (http)
+2025-10-27T21:34:38.284+01:00  INFO 27704 --- [demo] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-10-27T21:34:38.284+01:00  INFO 27704 --- [demo] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.39]
+2025-10-27T21:34:38.321+01:00  INFO 27704 --- [demo] [main] o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring embedded WebApplicationContext
+2025-10-27T21:34:38.323+01:00  INFO 27704 --- [demo] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1029 ms
+2025-10-27T21:34:38.400+01:00  INFO 27704 --- [demo] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-10-27T21:34:38.428+01:00  INFO 27704 --- [demo] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.11.Final
+2025-10-27T21:34:38.449+01:00  INFO 27704 --- [demo] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-10-27T21:34:38.626+01:00  INFO 27704 --- [demo] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-10-27T21:34:38.645+01:00  INFO 27704 --- [demo] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-10-27T21:34:38.753+01:00  INFO 27704 --- [demo] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@35e75f7a
+2025-10-27T21:34:38.755+01:00  INFO 27704 --- [demo] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-10-27T21:34:38.770+01:00  WARN 27704 --- [demo] [main] org.hibernate.orm.deprecation            : HHH90000025: MySQL8Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-10-27T21:34:38.772+01:00  WARN 27704 --- [demo] [main] org.hibernate.orm.deprecation            : HHH90000026: MySQL8Dialect has been deprecated; use org.hibernate.dialect.MySQLDialect instead
+2025-10-27T21:34:38.783+01:00  INFO 27704 --- [demo] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 8.0
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-10-27T21:34:39.627+01:00  INFO 27704 --- [demo] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-10-27T21:34:39.776+01:00  INFO 27704 --- [demo] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-10-27T21:34:39.948+01:00  INFO 27704 --- [demo] [main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-10-27T21:34:40.505+01:00  INFO 27704 --- [demo] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name custoUserDetailsService
+2025-10-27T21:34:40.662+01:00  WARN 27704 --- [demo] [main] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'simulationController': Unsatisfied dependency expressed through field 'simulationService': Error creating bean with name 'simulationServiceImpl': Injection of autowired dependencies failed
+2025-10-27T21:34:40.662+01:00  INFO 27704 --- [demo] [main] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-10-27T21:34:40.664+01:00  INFO 27704 --- [demo] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-10-27T21:34:40.669+01:00  INFO 27704 --- [demo] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2025-10-27T21:34:40.670+01:00  INFO 27704 --- [demo] [main] o.apache.catalina.core.StandardService   : Stopping service [Tomcat]
+2025-10-27T21:34:40.679+01:00  INFO 27704 --- [demo] [main] .s.b.a.l.ConditionEvaluationReportLogger : 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2025-10-27T21:34:40.689+01:00 ERROR 27704 --- [demo] [main] o.s.boot.SpringApplication               : Application run failed
+
+org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'simulationController': Unsatisfied dependency expressed through field 'simulationService': Error creating bean with name 'simulationServiceImpl': Injection of autowired dependencies failed
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.resolveFieldValue(AutowiredAnnotationBeanPostProcessor.java:788) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:768) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.annotation.InjectionMetadata.inject(InjectionMetadata.java:146) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessProperties(AutowiredAnnotationBeanPostProcessor.java:509) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1445) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:600) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:523) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:347) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.instantiateSingleton(DefaultListableBeanFactory.java:1155) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingleton(DefaultListableBeanFactory.java:1121) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:1056) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:987) ~[spring-context-6.2.5.jar:6.2.5]
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:627) ~[spring-context-6.2.5.jar:6.2.5]
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146) ~[spring-boot-3.4.4.jar:3.4.4]
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:752) ~[spring-boot-3.4.4.jar:3.4.4]
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439) ~[spring-boot-3.4.4.jar:3.4.4]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:318) ~[spring-boot-3.4.4.jar:3.4.4]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1361) ~[spring-boot-3.4.4.jar:3.4.4]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1350) ~[spring-boot-3.4.4.jar:3.4.4]
+	at com.demo.demo.DemoApplication.main(DemoApplication.java:13) ~[classes/:na]
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'simulationServiceImpl': Injection of autowired dependencies failed
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessProperties(AutowiredAnnotationBeanPostProcessor.java:515) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1445) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:600) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:523) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:347) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:254) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1667) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1555) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.resolveFieldValue(AutowiredAnnotationBeanPostProcessor.java:785) ~[spring-beans-6.2.5.jar:6.2.5]
+	... 22 common frames omitted
+Caused by: org.springframework.util.PlaceholderResolutionException: Could not resolve placeholder 'app.trading.export.dir' in value "${app.trading.export.dir}"
+	at org.springframework.util.PlaceholderResolutionException.withValue(PlaceholderResolutionException.java:81) ~[spring-core-6.2.5.jar:6.2.5]
+	at org.springframework.util.PlaceholderParser$ParsedValue.resolve(PlaceholderParser.java:423) ~[spring-core-6.2.5.jar:6.2.5]
+	at org.springframework.util.PlaceholderParser.replacePlaceholders(PlaceholderParser.java:128) ~[spring-core-6.2.5.jar:6.2.5]
+	at org.springframework.util.PropertyPlaceholderHelper.parseStringValue(PropertyPlaceholderHelper.java:118) ~[spring-core-6.2.5.jar:6.2.5]
+	at org.springframework.util.PropertyPlaceholderHelper.replacePlaceholders(PropertyPlaceholderHelper.java:114) ~[spring-core-6.2.5.jar:6.2.5]
+	at org.springframework.core.env.AbstractPropertyResolver.doResolvePlaceholders(AbstractPropertyResolver.java:255) ~[spring-core-6.2.5.jar:6.2.5]
+	at org.springframework.core.env.AbstractPropertyResolver.resolveRequiredPlaceholders(AbstractPropertyResolver.java:226) ~[spring-core-6.2.5.jar:6.2.5]
+	at org.springframework.context.support.PropertySourcesPlaceholderConfigurer.lambda$processProperties$0(PropertySourcesPlaceholderConfigurer.java:201) ~[spring-context-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.resolveEmbeddedValue(AbstractBeanFactory.java:971) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1577) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1555) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.resolveFieldValue(AutowiredAnnotationBeanPostProcessor.java:785) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:768) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.annotation.InjectionMetadata.inject(InjectionMetadata.java:146) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessProperties(AutowiredAnnotationBeanPostProcessor.java:509) ~[spring-beans-6.2.5.jar:6.2.5]
+	... 33 common frames omitted
+
+2025-10-27T21:39:06.810+01:00  INFO 22240 --- [demo] [main] com.demo.demo.DemoApplication            : Starting DemoApplication using Java 23.0.1 with PID 22240 (C:\Users\Hibas\Downloads\simulateur\SimulateurBackend-principal\target\classes started by Hibas in C:\Users\Hibas\Downloads\simulateur\SimulateurBackend-principal)
+2025-10-27T21:39:06.812+01:00  INFO 22240 --- [demo] [main] com.demo.demo.DemoApplication            : No active profile set, falling back to 1 default profile: "default"
+2025-10-27T21:39:07.483+01:00  INFO 22240 --- [demo] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-10-27T21:39:07.544+01:00  INFO 22240 --- [demo] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 54 ms. Found 7 JPA repository interfaces.
+2025-10-27T21:39:07.965+01:00  INFO 22240 --- [demo] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8082 (http)
+2025-10-27T21:39:07.980+01:00  INFO 22240 --- [demo] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-10-27T21:39:07.980+01:00  INFO 22240 --- [demo] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.39]
+2025-10-27T21:39:08.030+01:00  INFO 22240 --- [demo] [main] o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring embedded WebApplicationContext
+2025-10-27T21:39:08.030+01:00  INFO 22240 --- [demo] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1182 ms
+2025-10-27T21:39:08.144+01:00  INFO 22240 --- [demo] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-10-27T21:39:08.199+01:00  INFO 22240 --- [demo] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.11.Final
+2025-10-27T21:39:08.235+01:00  INFO 22240 --- [demo] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-10-27T21:39:08.489+01:00  INFO 22240 --- [demo] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-10-27T21:39:08.516+01:00  INFO 22240 --- [demo] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-10-27T21:39:08.637+01:00  INFO 22240 --- [demo] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@269c7104
+2025-10-27T21:39:08.643+01:00  INFO 22240 --- [demo] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-10-27T21:39:08.660+01:00  WARN 22240 --- [demo] [main] org.hibernate.orm.deprecation            : HHH90000025: MySQL8Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-10-27T21:39:08.661+01:00  WARN 22240 --- [demo] [main] org.hibernate.orm.deprecation            : HHH90000026: MySQL8Dialect has been deprecated; use org.hibernate.dialect.MySQLDialect instead
+2025-10-27T21:39:08.676+01:00  INFO 22240 --- [demo] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 8.0
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-10-27T21:39:09.576+01:00  INFO 22240 --- [demo] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-10-27T21:39:09.710+01:00  INFO 22240 --- [demo] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-10-27T21:39:09.947+01:00  INFO 22240 --- [demo] [main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-10-27T21:39:10.494+01:00  INFO 22240 --- [demo] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name custoUserDetailsService
+2025-10-27T21:39:10.659+01:00  WARN 22240 --- [demo] [main] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'simulationController': Unsatisfied dependency expressed through field 'simulationService': Error creating bean with name 'simulationServiceImpl': Injection of autowired dependencies failed
+2025-10-27T21:39:10.659+01:00  INFO 22240 --- [demo] [main] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-10-27T21:39:10.661+01:00  INFO 22240 --- [demo] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-10-27T21:39:10.666+01:00  INFO 22240 --- [demo] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2025-10-27T21:39:10.667+01:00  INFO 22240 --- [demo] [main] o.apache.catalina.core.StandardService   : Stopping service [Tomcat]
+2025-10-27T21:39:10.675+01:00  INFO 22240 --- [demo] [main] .s.b.a.l.ConditionEvaluationReportLogger : 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2025-10-27T21:39:10.688+01:00 ERROR 22240 --- [demo] [main] o.s.boot.SpringApplication               : Application run failed
+
+org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'simulationController': Unsatisfied dependency expressed through field 'simulationService': Error creating bean with name 'simulationServiceImpl': Injection of autowired dependencies failed
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.resolveFieldValue(AutowiredAnnotationBeanPostProcessor.java:788) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:768) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.annotation.InjectionMetadata.inject(InjectionMetadata.java:146) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessProperties(AutowiredAnnotationBeanPostProcessor.java:509) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1445) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:600) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:523) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:347) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.instantiateSingleton(DefaultListableBeanFactory.java:1155) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingleton(DefaultListableBeanFactory.java:1121) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:1056) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:987) ~[spring-context-6.2.5.jar:6.2.5]
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:627) ~[spring-context-6.2.5.jar:6.2.5]
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146) ~[spring-boot-3.4.4.jar:3.4.4]
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:752) ~[spring-boot-3.4.4.jar:3.4.4]
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439) ~[spring-boot-3.4.4.jar:3.4.4]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:318) ~[spring-boot-3.4.4.jar:3.4.4]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1361) ~[spring-boot-3.4.4.jar:3.4.4]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1350) ~[spring-boot-3.4.4.jar:3.4.4]
+	at com.demo.demo.DemoApplication.main(DemoApplication.java:13) ~[classes/:na]
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'simulationServiceImpl': Injection of autowired dependencies failed
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessProperties(AutowiredAnnotationBeanPostProcessor.java:515) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1445) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:600) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:523) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:347) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:254) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1667) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1555) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.resolveFieldValue(AutowiredAnnotationBeanPostProcessor.java:785) ~[spring-beans-6.2.5.jar:6.2.5]
+	... 22 common frames omitted
+Caused by: org.springframework.util.PlaceholderResolutionException: Could not resolve placeholder 'app.trading.export.dir' in value "${app.trading.export.dir}"
+	at org.springframework.util.PlaceholderResolutionException.withValue(PlaceholderResolutionException.java:81) ~[spring-core-6.2.5.jar:6.2.5]
+	at org.springframework.util.PlaceholderParser$ParsedValue.resolve(PlaceholderParser.java:423) ~[spring-core-6.2.5.jar:6.2.5]
+	at org.springframework.util.PlaceholderParser.replacePlaceholders(PlaceholderParser.java:128) ~[spring-core-6.2.5.jar:6.2.5]
+	at org.springframework.util.PropertyPlaceholderHelper.parseStringValue(PropertyPlaceholderHelper.java:118) ~[spring-core-6.2.5.jar:6.2.5]
+	at org.springframework.util.PropertyPlaceholderHelper.replacePlaceholders(PropertyPlaceholderHelper.java:114) ~[spring-core-6.2.5.jar:6.2.5]
+	at org.springframework.core.env.AbstractPropertyResolver.doResolvePlaceholders(AbstractPropertyResolver.java:255) ~[spring-core-6.2.5.jar:6.2.5]
+	at org.springframework.core.env.AbstractPropertyResolver.resolveRequiredPlaceholders(AbstractPropertyResolver.java:226) ~[spring-core-6.2.5.jar:6.2.5]
+	at org.springframework.context.support.PropertySourcesPlaceholderConfigurer.lambda$processProperties$0(PropertySourcesPlaceholderConfigurer.java:201) ~[spring-context-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.resolveEmbeddedValue(AbstractBeanFactory.java:971) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1577) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1555) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.resolveFieldValue(AutowiredAnnotationBeanPostProcessor.java:785) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:768) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.annotation.InjectionMetadata.inject(InjectionMetadata.java:146) ~[spring-beans-6.2.5.jar:6.2.5]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessProperties(AutowiredAnnotationBeanPostProcessor.java:509) ~[spring-beans-6.2.5.jar:6.2.5]
+	... 33 common frames omitted
+
+2025-10-27T21:42:21.447+01:00  INFO 16212 --- [demo] [main] com.demo.demo.DemoApplication            : Starting DemoApplication using Java 23.0.1 with PID 16212 (C:\Users\Hibas\Downloads\simulateur\SimulateurBackend-principal\target\classes started by Hibas in C:\Users\Hibas\Downloads\simulateur\SimulateurBackend-principal)
+2025-10-27T21:42:21.448+01:00  INFO 16212 --- [demo] [main] com.demo.demo.DemoApplication            : No active profile set, falling back to 1 default profile: "default"
+2025-10-27T21:42:22.227+01:00  INFO 16212 --- [demo] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-10-27T21:42:22.295+01:00  INFO 16212 --- [demo] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 62 ms. Found 7 JPA repository interfaces.
+2025-10-27T21:42:22.736+01:00  INFO 16212 --- [demo] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8082 (http)
+2025-10-27T21:42:22.748+01:00  INFO 16212 --- [demo] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-10-27T21:42:22.748+01:00  INFO 16212 --- [demo] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.39]
+2025-10-27T21:42:22.793+01:00  INFO 16212 --- [demo] [main] o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring embedded WebApplicationContext
+2025-10-27T21:42:22.793+01:00  INFO 16212 --- [demo] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1297 ms
+2025-10-27T21:42:22.883+01:00  INFO 16212 --- [demo] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-10-27T21:42:22.935+01:00  INFO 16212 --- [demo] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.11.Final
+2025-10-27T21:42:22.966+01:00  INFO 16212 --- [demo] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-10-27T21:42:23.184+01:00  INFO 16212 --- [demo] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-10-27T21:42:23.209+01:00  INFO 16212 --- [demo] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-10-27T21:42:23.328+01:00  INFO 16212 --- [demo] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@1533338c
+2025-10-27T21:42:23.329+01:00  INFO 16212 --- [demo] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-10-27T21:42:23.346+01:00  WARN 16212 --- [demo] [main] org.hibernate.orm.deprecation            : HHH90000025: MySQL8Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-10-27T21:42:23.347+01:00  WARN 16212 --- [demo] [main] org.hibernate.orm.deprecation            : HHH90000026: MySQL8Dialect has been deprecated; use org.hibernate.dialect.MySQLDialect instead
+2025-10-27T21:42:23.360+01:00  INFO 16212 --- [demo] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 8.0
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-10-27T21:42:24.271+01:00  INFO 16212 --- [demo] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-10-27T21:42:24.437+01:00  INFO 16212 --- [demo] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-10-27T21:42:24.638+01:00  INFO 16212 --- [demo] [main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-10-27T21:42:25.276+01:00  INFO 16212 --- [demo] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name custoUserDetailsService
+2025-10-27T21:42:25.537+01:00  WARN 16212 --- [demo] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-10-27T21:42:26.031+01:00  INFO 16212 --- [demo] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8082 (http) with context path '/api'
+2025-10-27T21:42:26.040+01:00  INFO 16212 --- [demo] [main] com.demo.demo.DemoApplication            : Started DemoApplication in 5.027 seconds (process running for 5.71)
+2025-10-27T21:42:26.080+01:00  INFO 16212 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : 🔄 Analyse des devises en cours pour simu #1 - 21:42:26
+2025-10-27T21:42:27.261+01:00  WARN 16212 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour EURUSD=X: utilisation fallback
+2025-10-27T21:42:28.997+01:00  WARN 16212 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour EURUSD=X: utilisation fallback
+2025-10-27T21:42:30.093+01:00  WARN 16212 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour USDJPY=X: utilisation fallback
+2025-10-27T21:42:30.859+01:00  WARN 16212 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour USDJPY=X: utilisation fallback
+2025-10-27T21:42:31.565+01:00  WARN 16212 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour GBPUSD=X: utilisation fallback
+2025-10-27T21:42:32.603+01:00  WARN 16212 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour GBPUSD=X: utilisation fallback
+2025-10-27T21:42:34.503+01:00  WARN 16212 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour EURJPY=X: utilisation fallback
+2025-10-27T21:42:35.235+01:00  WARN 16212 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour EURJPY=X: utilisation fallback
+2025-10-27T21:42:36.093+01:00  WARN 16212 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour AUDUSD=X: utilisation fallback
+2025-10-27T21:42:36.782+01:00  WARN 16212 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour AUDUSD=X: utilisation fallback
+2025-10-27T21:42:37.511+01:00  WARN 16212 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour USDCAD=X: utilisation fallback
+2025-10-27T21:42:38.347+01:00  WARN 16212 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour USDCAD=X: utilisation fallback
+2025-10-27T21:42:38.861+01:00  INFO 16212 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : 💾 Export CSV: ./trading_exports/multi_signals_20251027_2142_1.csv
+2025-10-27T21:42:38.948+01:00  INFO 16212 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : 🎯 Dashboard JSON sauvegardé pour simu #1
+2025-10-27T21:42:38.949+01:00  INFO 16212 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : 🔄 Analyse des devises en cours pour simu #8 - 21:42:38
+2025-10-27T21:42:39.196+01:00  WARN 16212 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour EURUSD=X: utilisation fallback
+2025-10-27T21:42:39.905+01:00  WARN 16212 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour EURUSD=X: utilisation fallback
+2025-10-27T21:42:41.627+01:00  WARN 16212 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour USDJPY=X: utilisation fallback
+2025-10-27T21:42:42.362+01:00  WARN 16212 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour USDJPY=X: utilisation fallback
+2025-10-27T21:42:43.163+01:00  WARN 16212 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour GBPUSD=X: utilisation fallback
+2025-10-27T21:42:43.867+01:00  WARN 16212 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour GBPUSD=X: utilisation fallback
+2025-10-27T21:42:44.530+01:00  WARN 16212 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour EURJPY=X: utilisation fallback
+2025-10-27T21:42:45.601+01:00  WARN 16212 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour EURJPY=X: utilisation fallback
+2025-10-27T21:42:46.333+01:00  WARN 16212 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour AUDUSD=X: utilisation fallback
+2025-10-27T21:42:47.059+01:00  WARN 16212 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour AUDUSD=X: utilisation fallback
+2025-10-27T21:42:47.805+01:00  WARN 16212 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour USDCAD=X: utilisation fallback
+2025-10-27T21:42:48.534+01:00  WARN 16212 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour USDCAD=X: utilisation fallback
+2025-10-27T21:42:49.047+01:00  INFO 16212 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : 💾 Export CSV: ./trading_exports/multi_signals_20251027_2142_8.csv
+2025-10-27T21:42:49.064+01:00  INFO 16212 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : 🎯 Dashboard JSON sauvegardé pour simu #8
+2025-10-27T21:42:49.064+01:00  INFO 16212 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : ⏳ Prochaine mise à jour dans 5 minutes...
+2025-10-27T21:46:10.341+01:00  INFO 16212 --- [demo] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-10-27T21:46:10.347+01:00  INFO 16212 --- [demo] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-10-27T21:46:10.354+01:00  INFO 16212 --- [demo] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-10-27T21:46:10.356+01:00  INFO 16212 --- [demo] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-10-27T21:46:10.364+01:00  INFO 16212 --- [demo] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2025-10-27T21:46:14.024+01:00  INFO 18612 --- [demo] [main] com.demo.demo.DemoApplication            : Starting DemoApplication using Java 23.0.1 with PID 18612 (C:\Users\Hibas\Downloads\simulateur\SimulateurBackend-principal\target\classes started by Hibas in C:\Users\Hibas\Downloads\simulateur\SimulateurBackend-principal)
+2025-10-27T21:46:14.026+01:00  INFO 18612 --- [demo] [main] com.demo.demo.DemoApplication            : No active profile set, falling back to 1 default profile: "default"
+2025-10-27T21:46:14.706+01:00  INFO 18612 --- [demo] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-10-27T21:46:14.770+01:00  INFO 18612 --- [demo] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 57 ms. Found 7 JPA repository interfaces.
+2025-10-27T21:46:15.174+01:00  INFO 18612 --- [demo] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8082 (http)
+2025-10-27T21:46:15.184+01:00  INFO 18612 --- [demo] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-10-27T21:46:15.184+01:00  INFO 18612 --- [demo] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.39]
+2025-10-27T21:46:15.229+01:00  INFO 18612 --- [demo] [main] o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring embedded WebApplicationContext
+2025-10-27T21:46:15.229+01:00  INFO 18612 --- [demo] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1154 ms
+2025-10-27T21:46:15.352+01:00  INFO 18612 --- [demo] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-10-27T21:46:15.412+01:00  INFO 18612 --- [demo] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.11.Final
+2025-10-27T21:46:15.447+01:00  INFO 18612 --- [demo] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-10-27T21:46:15.651+01:00  INFO 18612 --- [demo] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-10-27T21:46:15.675+01:00  INFO 18612 --- [demo] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-10-27T21:46:15.792+01:00  INFO 18612 --- [demo] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@2d4e99de
+2025-10-27T21:46:15.793+01:00  INFO 18612 --- [demo] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-10-27T21:46:15.813+01:00  WARN 18612 --- [demo] [main] org.hibernate.orm.deprecation            : HHH90000025: MySQL8Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-10-27T21:46:15.815+01:00  WARN 18612 --- [demo] [main] org.hibernate.orm.deprecation            : HHH90000026: MySQL8Dialect has been deprecated; use org.hibernate.dialect.MySQLDialect instead
+2025-10-27T21:46:15.830+01:00  INFO 18612 --- [demo] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 8.0
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-10-27T21:46:16.808+01:00  INFO 18612 --- [demo] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-10-27T21:46:16.981+01:00  INFO 18612 --- [demo] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-10-27T21:46:17.223+01:00  INFO 18612 --- [demo] [main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-10-27T21:46:17.810+01:00  INFO 18612 --- [demo] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name custoUserDetailsService
+2025-10-27T21:46:18.068+01:00  WARN 18612 --- [demo] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-10-27T21:46:18.681+01:00  INFO 18612 --- [demo] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8082 (http) with context path '/api'
+2025-10-27T21:46:18.690+01:00  INFO 18612 --- [demo] [main] com.demo.demo.DemoApplication            : Started DemoApplication in 5.093 seconds (process running for 5.675)
+2025-10-27T21:46:18.736+01:00  INFO 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : 🔄 Analyse des devises en cours pour simu #1 - 21:46:18
+2025-10-27T21:46:19.963+01:00  WARN 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour EURUSD=X: utilisation fallback
+2025-10-27T21:46:24.070+01:00  WARN 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour EURUSD=X: utilisation fallback
+2025-10-27T21:46:25.195+01:00  WARN 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour USDJPY=X: utilisation fallback
+2025-10-27T21:46:26.419+01:00  WARN 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour USDJPY=X: utilisation fallback
+2025-10-27T21:46:27.193+01:00  WARN 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour GBPUSD=X: utilisation fallback
+2025-10-27T21:46:27.930+01:00  WARN 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour GBPUSD=X: utilisation fallback
+2025-10-27T21:46:28.740+01:00  WARN 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour EURJPY=X: utilisation fallback
+2025-10-27T21:46:29.463+01:00  WARN 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour EURJPY=X: utilisation fallback
+2025-10-27T21:46:30.388+01:00  WARN 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour AUDUSD=X: utilisation fallback
+2025-10-27T21:46:31.100+01:00  WARN 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour AUDUSD=X: utilisation fallback
+2025-10-27T21:46:32.121+01:00  WARN 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour USDCAD=X: utilisation fallback
+2025-10-27T21:46:33.154+01:00  WARN 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour USDCAD=X: utilisation fallback
+2025-10-27T21:46:33.664+01:00  INFO 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : 💾 Export CSV: ./trading_exports/multi_signals_20251027_2146_1.csv
+2025-10-27T21:46:33.740+01:00  INFO 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : 🎯 Dashboard JSON sauvegardé pour simu #1
+2025-10-27T21:46:33.743+01:00  INFO 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : 🔄 Analyse des devises en cours pour simu #8 - 21:46:33
+2025-10-27T21:46:33.967+01:00  WARN 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour EURUSD=X: utilisation fallback
+2025-10-27T21:46:34.678+01:00  WARN 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour EURUSD=X: utilisation fallback
+2025-10-27T21:46:35.707+01:00  WARN 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour USDJPY=X: utilisation fallback
+2025-10-27T21:46:36.598+01:00  WARN 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour USDJPY=X: utilisation fallback
+2025-10-27T21:46:37.469+01:00  WARN 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour GBPUSD=X: utilisation fallback
+2025-10-27T21:46:38.257+01:00  WARN 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour GBPUSD=X: utilisation fallback
+2025-10-27T21:46:38.999+01:00  WARN 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour EURJPY=X: utilisation fallback
+2025-10-27T21:46:39.992+01:00  WARN 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour EURJPY=X: utilisation fallback
+2025-10-27T21:46:40.744+01:00  WARN 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour AUDUSD=X: utilisation fallback
+2025-10-27T21:46:41.496+01:00  WARN 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour AUDUSD=X: utilisation fallback
+2025-10-27T21:46:42.360+01:00  WARN 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour USDCAD=X: utilisation fallback
+2025-10-27T21:46:43.107+01:00  WARN 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour USDCAD=X: utilisation fallback
+2025-10-27T21:46:43.610+01:00  INFO 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : 💾 Export CSV: ./trading_exports/multi_signals_20251027_2146_8.csv
+2025-10-27T21:46:43.637+01:00  INFO 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : 🎯 Dashboard JSON sauvegardé pour simu #8
+2025-10-27T21:46:43.637+01:00  INFO 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : ⏳ Prochaine mise à jour dans 5 minutes...
+2025-10-27T21:47:22.618+01:00  INFO 18612 --- [demo] [http-nio-8082-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-10-27T21:47:22.618+01:00  INFO 18612 --- [demo] [http-nio-8082-exec-2] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2025-10-27T21:47:22.624+01:00  INFO 18612 --- [demo] [http-nio-8082-exec-2] o.s.web.servlet.DispatcherServlet        : Completed initialization in 6 ms
+2025-10-27T21:47:22.681+01:00  INFO 18612 --- [demo] [http-nio-8082-exec-2] c.d.d.s.SimulationServiceImpl            : 🔄 Analyse des devises en cours pour simu #1 - 21:47:22
+2025-10-27T21:47:23.362+01:00  WARN 18612 --- [demo] [http-nio-8082-exec-2] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour EURUSD=X: utilisation fallback
+2025-10-27T21:47:25.150+01:00  WARN 18612 --- [demo] [http-nio-8082-exec-2] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour EURUSD=X: utilisation fallback
+2025-10-27T21:47:27.689+01:00  WARN 18612 --- [demo] [http-nio-8082-exec-2] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour USDJPY=X: utilisation fallback
+2025-10-27T21:47:28.808+01:00  WARN 18612 --- [demo] [http-nio-8082-exec-2] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour USDJPY=X: utilisation fallback
+2025-10-27T21:47:30.033+01:00  WARN 18612 --- [demo] [http-nio-8082-exec-2] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour GBPUSD=X: utilisation fallback
+2025-10-27T21:47:32.973+01:00  WARN 18612 --- [demo] [http-nio-8082-exec-2] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour GBPUSD=X: utilisation fallback
+2025-10-27T21:47:35.803+01:00  WARN 18612 --- [demo] [http-nio-8082-exec-2] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour EURJPY=X: utilisation fallback
+2025-10-27T21:47:37.953+01:00  WARN 18612 --- [demo] [http-nio-8082-exec-2] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour EURJPY=X: utilisation fallback
+2025-10-27T21:47:39.932+01:00  WARN 18612 --- [demo] [http-nio-8082-exec-2] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour AUDUSD=X: utilisation fallback
+2025-10-27T21:47:41.422+01:00  WARN 18612 --- [demo] [http-nio-8082-exec-2] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour AUDUSD=X: utilisation fallback
+2025-10-27T21:47:42.680+01:00  WARN 18612 --- [demo] [http-nio-8082-exec-2] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour USDCAD=X: utilisation fallback
+2025-10-27T21:47:43.777+01:00  WARN 18612 --- [demo] [http-nio-8082-exec-2] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour USDCAD=X: utilisation fallback
+2025-10-27T21:47:44.302+01:00  INFO 18612 --- [demo] [http-nio-8082-exec-2] c.d.d.s.SimulationServiceImpl            : 💾 Export CSV: ./trading_exports/multi_signals_20251027_2147_1.csv
+2025-10-27T21:47:44.317+01:00  INFO 18612 --- [demo] [http-nio-8082-exec-2] c.d.d.s.SimulationServiceImpl            : 🎯 Dashboard JSON sauvegardé pour simu #1
+2025-10-27T21:51:43.761+01:00  INFO 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : 🔄 Analyse des devises en cours pour simu #1 - 21:51:43
+2025-10-27T21:51:45.027+01:00  WARN 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour EURUSD=X: utilisation fallback
+2025-10-27T21:51:45.759+01:00  WARN 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour EURUSD=X: utilisation fallback
+2025-10-27T21:51:46.498+01:00  WARN 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour USDJPY=X: utilisation fallback
+2025-10-27T21:51:47.231+01:00  WARN 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour USDJPY=X: utilisation fallback
+2025-10-27T21:51:47.998+01:00  WARN 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour GBPUSD=X: utilisation fallback
+2025-10-27T21:51:48.772+01:00  WARN 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour GBPUSD=X: utilisation fallback
+2025-10-27T21:51:49.487+01:00  WARN 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour EURJPY=X: utilisation fallback
+2025-10-27T21:51:50.607+01:00  WARN 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour EURJPY=X: utilisation fallback
+2025-10-27T21:51:51.389+01:00  WARN 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour AUDUSD=X: utilisation fallback
+2025-10-27T21:51:53.388+01:00  WARN 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour AUDUSD=X: utilisation fallback
+2025-10-27T21:51:54.137+01:00  WARN 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour USDCAD=X: utilisation fallback
+2025-10-27T21:51:55.041+01:00  WARN 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour USDCAD=X: utilisation fallback
+2025-10-27T21:51:55.555+01:00  INFO 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : 💾 Export CSV: ./trading_exports/multi_signals_20251027_2151_1.csv
+2025-10-27T21:51:55.594+01:00  INFO 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : 🎯 Dashboard JSON sauvegardé pour simu #1
+2025-10-27T21:51:55.597+01:00  INFO 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : 🔄 Analyse des devises en cours pour simu #8 - 21:51:55
+2025-10-27T21:51:55.816+01:00  WARN 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour EURUSD=X: utilisation fallback
+2025-10-27T21:51:56.703+01:00  WARN 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour EURUSD=X: utilisation fallback
+2025-10-27T21:51:57.806+01:00  WARN 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour USDJPY=X: utilisation fallback
+2025-10-27T21:51:58.544+01:00  WARN 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour USDJPY=X: utilisation fallback
+2025-10-27T21:52:00.338+01:00  WARN 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour GBPUSD=X: utilisation fallback
+2025-10-27T21:52:01.062+01:00  WARN 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour GBPUSD=X: utilisation fallback
+2025-10-27T21:52:05.104+01:00  WARN 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour EURJPY=X: utilisation fallback
+2025-10-27T21:52:05.853+01:00  WARN 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour EURJPY=X: utilisation fallback
+2025-10-27T21:52:06.530+01:00  WARN 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour AUDUSD=X: utilisation fallback
+2025-10-27T21:52:08.941+01:00  WARN 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour AUDUSD=X: utilisation fallback
+2025-10-27T21:52:09.783+01:00  WARN 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour USDCAD=X: utilisation fallback
+2025-10-27T21:52:10.504+01:00  WARN 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : Yahoo fetch échoué pour USDCAD=X: utilisation fallback
+2025-10-27T21:52:11.023+01:00  INFO 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : 💾 Export CSV: ./trading_exports/multi_signals_20251027_2152_8.csv
+2025-10-27T21:52:11.038+01:00  INFO 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : 🎯 Dashboard JSON sauvegardé pour simu #8
+2025-10-27T21:52:11.038+01:00  INFO 18612 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : ⏳ Prochaine mise à jour dans 5 minutes...
+2025-10-27T21:55:50.852+01:00  INFO 18612 --- [demo] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-10-27T21:55:50.875+01:00  INFO 18612 --- [demo] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-10-27T21:55:50.901+01:00  INFO 18612 --- [demo] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-10-27T21:55:50.927+01:00  INFO 18612 --- [demo] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-10-27T21:55:50.977+01:00  INFO 18612 --- [demo] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2025-10-27T21:55:54.797+01:00  INFO 26500 --- [demo] [main] com.demo.demo.DemoApplication            : Starting DemoApplication using Java 23.0.1 with PID 26500 (C:\Users\Hibas\Downloads\simulateur\SimulateurBackend-principal\target\classes started by Hibas in C:\Users\Hibas\Downloads\simulateur\SimulateurBackend-principal)
+2025-10-27T21:55:54.799+01:00  INFO 26500 --- [demo] [main] com.demo.demo.DemoApplication            : No active profile set, falling back to 1 default profile: "default"
+2025-10-27T21:55:55.626+01:00  INFO 26500 --- [demo] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-10-27T21:55:55.688+01:00  INFO 26500 --- [demo] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 55 ms. Found 7 JPA repository interfaces.
+2025-10-27T21:55:56.122+01:00  INFO 26500 --- [demo] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8082 (http)
+2025-10-27T21:55:56.135+01:00  INFO 26500 --- [demo] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-10-27T21:55:56.135+01:00  INFO 26500 --- [demo] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.39]
+2025-10-27T21:55:56.179+01:00  INFO 26500 --- [demo] [main] o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring embedded WebApplicationContext
+2025-10-27T21:55:56.179+01:00  INFO 26500 --- [demo] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1328 ms
+2025-10-27T21:55:56.291+01:00  INFO 26500 --- [demo] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-10-27T21:55:56.349+01:00  INFO 26500 --- [demo] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.11.Final
+2025-10-27T21:55:56.384+01:00  INFO 26500 --- [demo] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-10-27T21:55:56.597+01:00  INFO 26500 --- [demo] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-10-27T21:55:56.621+01:00  INFO 26500 --- [demo] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-10-27T21:55:56.759+01:00  INFO 26500 --- [demo] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@3a6556b6
+2025-10-27T21:55:56.760+01:00  INFO 26500 --- [demo] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-10-27T21:55:56.777+01:00  WARN 26500 --- [demo] [main] org.hibernate.orm.deprecation            : HHH90000025: MySQL8Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-10-27T21:55:56.778+01:00  WARN 26500 --- [demo] [main] org.hibernate.orm.deprecation            : HHH90000026: MySQL8Dialect has been deprecated; use org.hibernate.dialect.MySQLDialect instead
+2025-10-27T21:55:56.792+01:00  INFO 26500 --- [demo] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 8.0
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-10-27T21:55:57.777+01:00  INFO 26500 --- [demo] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-10-27T21:55:57.965+01:00  INFO 26500 --- [demo] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-10-27T21:55:58.198+01:00  INFO 26500 --- [demo] [main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-10-27T21:55:58.758+01:00  INFO 26500 --- [demo] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name custoUserDetailsService
+2025-10-27T21:55:59.023+01:00  WARN 26500 --- [demo] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-10-27T21:55:59.483+01:00  INFO 26500 --- [demo] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8082 (http) with context path '/api'
+2025-10-27T21:55:59.491+01:00  INFO 26500 --- [demo] [main] com.demo.demo.DemoApplication            : Started DemoApplication in 5.15 seconds (process running for 5.855)
+2025-10-27T21:55:59.527+01:00  INFO 26500 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : 🔄 Analyse des devises en cours pour simu #1 - 21:55:59
+2025-10-27T21:56:09.884+01:00  INFO 26500 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : 💾 Export CSV: ./trading_exports/multi_signals_20251027_2156_1.csv
+2025-10-27T21:56:09.968+01:00  INFO 26500 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : 🎯 Dashboard JSON sauvegardé pour simu #1
+2025-10-27T21:56:09.970+01:00  INFO 26500 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : 🔄 Analyse des devises en cours pour simu #8 - 21:56:09
+2025-10-27T21:56:21.628+01:00  INFO 26500 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : 💾 Export CSV: ./trading_exports/multi_signals_20251027_2156_8.csv
+2025-10-27T21:56:21.643+01:00  INFO 26500 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : 🎯 Dashboard JSON sauvegardé pour simu #8
+2025-10-27T21:56:21.643+01:00  INFO 26500 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : ⏳ Prochaine mise à jour dans 5 minutes...
+2025-10-27T21:59:21.461+01:00  INFO 26500 --- [demo] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-10-27T21:59:21.471+01:00  INFO 26500 --- [demo] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-10-27T21:59:21.480+01:00  INFO 26500 --- [demo] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-10-27T21:59:21.487+01:00  INFO 26500 --- [demo] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-10-27T21:59:21.499+01:00  INFO 26500 --- [demo] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2025-10-27T22:00:22.839+01:00  INFO 26576 --- [demo] [main] com.demo.demo.DemoApplication            : Starting DemoApplication using Java 23.0.1 with PID 26576 (C:\Users\Hibas\Downloads\simulateur\SimulateurBackend-principal\target\classes started by Hibas in C:\Users\Hibas\Downloads\simulateur\SimulateurBackend-principal)
+2025-10-27T22:00:22.841+01:00  INFO 26576 --- [demo] [main] com.demo.demo.DemoApplication            : No active profile set, falling back to 1 default profile: "default"
+2025-10-27T22:00:23.569+01:00  INFO 26576 --- [demo] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-10-27T22:00:23.629+01:00  INFO 26576 --- [demo] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 54 ms. Found 7 JPA repository interfaces.
+2025-10-27T22:00:24.042+01:00  INFO 26576 --- [demo] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8082 (http)
+2025-10-27T22:00:24.053+01:00  INFO 26576 --- [demo] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-10-27T22:00:24.053+01:00  INFO 26576 --- [demo] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.39]
+2025-10-27T22:00:24.095+01:00  INFO 26576 --- [demo] [main] o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring embedded WebApplicationContext
+2025-10-27T22:00:24.096+01:00  INFO 26576 --- [demo] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1209 ms
+2025-10-27T22:00:24.182+01:00  INFO 26576 --- [demo] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-10-27T22:00:24.231+01:00  INFO 26576 --- [demo] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.11.Final
+2025-10-27T22:00:24.259+01:00  INFO 26576 --- [demo] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-10-27T22:00:24.471+01:00  INFO 26576 --- [demo] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-10-27T22:00:24.495+01:00  INFO 26576 --- [demo] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-10-27T22:00:24.619+01:00  INFO 26576 --- [demo] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@34b2d51a
+2025-10-27T22:00:24.620+01:00  INFO 26576 --- [demo] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-10-27T22:00:24.638+01:00  WARN 26576 --- [demo] [main] org.hibernate.orm.deprecation            : HHH90000025: MySQL8Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-10-27T22:00:24.638+01:00  WARN 26576 --- [demo] [main] org.hibernate.orm.deprecation            : HHH90000026: MySQL8Dialect has been deprecated; use org.hibernate.dialect.MySQLDialect instead
+2025-10-27T22:00:24.652+01:00  INFO 26576 --- [demo] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 8.0
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-10-27T22:00:25.596+01:00  INFO 26576 --- [demo] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-10-27T22:00:25.758+01:00  INFO 26576 --- [demo] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-10-27T22:00:25.991+01:00  INFO 26576 --- [demo] [main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-10-27T22:00:26.565+01:00  INFO 26576 --- [demo] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name custoUserDetailsService
+2025-10-27T22:00:26.838+01:00  WARN 26576 --- [demo] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-10-27T22:00:27.325+01:00  INFO 26576 --- [demo] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8082 (http) with context path '/api'
+2025-10-27T22:00:27.334+01:00  INFO 26576 --- [demo] [main] com.demo.demo.DemoApplication            : Started DemoApplication in 5.003 seconds (process running for 5.777)
+2025-10-27T22:00:27.373+01:00  INFO 26576 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : 🔄 Analyse des devises en cours pour simu #1 - 22:00:27
+2025-10-27T22:00:28.572+01:00  INFO 26576 --- [demo] [http-nio-8082-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-10-27T22:00:28.572+01:00  INFO 26576 --- [demo] [http-nio-8082-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2025-10-27T22:00:28.573+01:00  INFO 26576 --- [demo] [http-nio-8082-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2025-10-27T22:00:42.954+01:00  INFO 26576 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : 💾 Export CSV: ./trading_exports/multi_signals_20251027_2200_1.csv
+2025-10-27T22:00:43.055+01:00  INFO 26576 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : 🎯 Dashboard JSON sauvegardé pour simu #1
+2025-10-27T22:00:43.057+01:00  INFO 26576 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : 🔄 Analyse des devises en cours pour simu #8 - 22:00:43
+2025-10-27T22:00:52.473+01:00  INFO 26576 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : 💾 Export CSV: ./trading_exports/multi_signals_20251027_2200_8.csv
+2025-10-27T22:00:52.492+01:00  INFO 26576 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : 🎯 Dashboard JSON sauvegardé pour simu #8
+2025-10-27T22:00:52.492+01:00  INFO 26576 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : ⏳ Prochaine mise à jour dans 5 minutes...
+2025-10-27T22:02:52.594+01:00  INFO 26576 --- [demo] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-10-27T22:02:52.673+01:00  INFO 26576 --- [demo] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-10-27T22:02:52.712+01:00  INFO 26576 --- [demo] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-10-27T22:02:52.742+01:00  INFO 26576 --- [demo] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-10-27T22:02:52.780+01:00  INFO 26576 --- [demo] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2025-10-27T22:02:56.336+01:00  INFO 21080 --- [demo] [main] com.demo.demo.DemoApplication            : Starting DemoApplication using Java 23.0.1 with PID 21080 (C:\Users\Hibas\Downloads\simulateur\SimulateurBackend-principal\target\classes started by Hibas in C:\Users\Hibas\Downloads\simulateur\SimulateurBackend-principal)
+2025-10-27T22:02:56.337+01:00  INFO 21080 --- [demo] [main] com.demo.demo.DemoApplication            : No active profile set, falling back to 1 default profile: "default"
+2025-10-27T22:02:57.057+01:00  INFO 21080 --- [demo] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-10-27T22:02:57.119+01:00  INFO 21080 --- [demo] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 55 ms. Found 7 JPA repository interfaces.
+2025-10-27T22:02:57.531+01:00  INFO 21080 --- [demo] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8082 (http)
+2025-10-27T22:02:57.544+01:00  INFO 21080 --- [demo] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-10-27T22:02:57.545+01:00  INFO 21080 --- [demo] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.39]
+2025-10-27T22:02:57.598+01:00  INFO 21080 --- [demo] [main] o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring embedded WebApplicationContext
+2025-10-27T22:02:57.598+01:00  INFO 21080 --- [demo] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1213 ms
+2025-10-27T22:02:57.716+01:00  INFO 21080 --- [demo] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-10-27T22:02:57.765+01:00  INFO 21080 --- [demo] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.11.Final
+2025-10-27T22:02:57.795+01:00  INFO 21080 --- [demo] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-10-27T22:02:57.999+01:00  INFO 21080 --- [demo] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-10-27T22:02:58.024+01:00  INFO 21080 --- [demo] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-10-27T22:02:58.144+01:00  INFO 21080 --- [demo] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@cf10c92
+2025-10-27T22:02:58.145+01:00  INFO 21080 --- [demo] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-10-27T22:02:58.163+01:00  WARN 21080 --- [demo] [main] org.hibernate.orm.deprecation            : HHH90000025: MySQL8Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-10-27T22:02:58.164+01:00  WARN 21080 --- [demo] [main] org.hibernate.orm.deprecation            : HHH90000026: MySQL8Dialect has been deprecated; use org.hibernate.dialect.MySQLDialect instead
+2025-10-27T22:02:58.176+01:00  INFO 21080 --- [demo] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 8.0
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-10-27T22:02:59.100+01:00  INFO 21080 --- [demo] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-10-27T22:02:59.260+01:00  INFO 21080 --- [demo] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-10-27T22:02:59.433+01:00  INFO 21080 --- [demo] [main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-10-27T22:03:00.035+01:00  INFO 21080 --- [demo] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name custoUserDetailsService
+2025-10-27T22:03:00.294+01:00  WARN 21080 --- [demo] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-10-27T22:03:00.750+01:00  INFO 21080 --- [demo] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8082 (http) with context path '/api'
+2025-10-27T22:03:00.757+01:00  INFO 21080 --- [demo] [main] com.demo.demo.DemoApplication            : Started DemoApplication in 4.829 seconds (process running for 5.456)
+2025-10-27T22:03:00.797+01:00  INFO 21080 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : 🔄 Analyse des devises en cours pour simu #1 - 22:03:00
+2025-10-27T22:03:03.934+01:00  INFO 21080 --- [demo] [http-nio-8082-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-10-27T22:03:03.934+01:00  INFO 21080 --- [demo] [http-nio-8082-exec-2] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2025-10-27T22:03:03.935+01:00  INFO 21080 --- [demo] [http-nio-8082-exec-2] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2025-10-27T22:03:08.915+01:00  INFO 21080 --- [demo] [http-nio-8082-exec-3] c.d.d.s.SimulationServiceImpl            : 🔄 Analyse des devises en cours pour simu #1 - 22:03:08
+2025-10-27T22:03:09.389+01:00  INFO 21080 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : 💾 Export CSV: ./trading_exports/multi_signals_20251027_2203_1.csv
+2025-10-27T22:03:09.457+01:00  INFO 21080 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : 🎯 Dashboard JSON sauvegardé pour simu #1
+2025-10-27T22:03:09.459+01:00  INFO 21080 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : 🔄 Analyse des devises en cours pour simu #8 - 22:03:09
+2025-10-27T22:03:17.033+01:00  INFO 21080 --- [demo] [http-nio-8082-exec-3] c.d.d.s.SimulationServiceImpl            : 💾 Export CSV: ./trading_exports/multi_signals_20251027_2203_1.csv
+2025-10-27T22:03:17.045+01:00  INFO 21080 --- [demo] [http-nio-8082-exec-3] c.d.d.s.SimulationServiceImpl            : 🎯 Dashboard JSON sauvegardé pour simu #1
+2025-10-27T22:03:17.201+01:00  INFO 21080 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : 💾 Export CSV: ./trading_exports/multi_signals_20251027_2203_8.csv
+2025-10-27T22:03:17.232+01:00  INFO 21080 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : 🎯 Dashboard JSON sauvegardé pour simu #8
+2025-10-27T22:03:17.233+01:00  INFO 21080 --- [demo] [scheduling-1] c.d.d.s.SimulationServiceImpl            : ⏳ Prochaine mise à jour dans 5 minutes...
+2025-10-27T22:03:30.895+01:00  INFO 21080 --- [demo] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-10-27T22:03:30.900+01:00  INFO 21080 --- [demo] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-10-27T22:03:30.905+01:00  INFO 21080 --- [demo] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-10-27T22:03:30.906+01:00  INFO 21080 --- [demo] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-10-27T22:03:30.910+01:00  INFO 21080 --- [demo] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.

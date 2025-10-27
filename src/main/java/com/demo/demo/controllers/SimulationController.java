@@ -26,6 +26,7 @@ public class SimulationController {
         } catch (RuntimeException e) {
             return ResponseEntity.status(404).body(null); // 404 Not Found si non trouvée
         }
+
     }
 
     // Récupérer toutes les simulations
@@ -74,6 +75,20 @@ public class SimulationController {
             return ResponseEntity.ok(endedSimulation);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(null); // 400 si conditions non remplies
+        }
+    }
+    /**
+     * Récupérer le JSON dashboard forex (analyse + consensus, "photo" du tableau Python).
+     */
+    @GetMapping("/{id}/analyse")
+    public ResponseEntity<String> getForexAnalysis(@PathVariable Integer id) {
+        try {
+            Simulation sim = simulationService.getSimulationById(id);
+            // Force update si besoin (re-lance analyse)
+            simulationService.runForexAnalysisInSimulation(id);
+            return ResponseEntity.ok(sim.getAnalyseResultats()); // JSON string du dashboard
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(404).body("{}"); // JSON vide si erreur
         }
     }
 }
