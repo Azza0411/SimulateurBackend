@@ -1,6 +1,5 @@
 package com.demo.demo.security;
 
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -15,6 +14,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import static org.springframework.security.config.Customizer.withDefaults;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -38,6 +38,9 @@ public class SecurityConfig {
             .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
 
+                    // FIX : Accès public pour /api/simulations/** EN HAUT (priorité, couvre POST, GET, /end, /analyse, /ia-move)
+                    .requestMatchers("/api/simulations/**").permitAll()  // ← FIX : Tout simulations public (401 résolu pour POST /api/simulations)
+
                     // Swagger/OpenAPI - Accès public
                     .requestMatchers(
                             "/swagger-ui.html",
@@ -51,6 +54,20 @@ public class SecurityConfig {
                     // API Auth - Accès public
                     .requestMatchers("/api/auth/**").permitAll()
                     .requestMatchers("/api/cours-modules/**").permitAll()  // ← Ajouté ici pour autoriser /api/cours-modules sans auth
+                    // ===============================
+                    // SIMULATIONS - UNE LIGNE PAR MÉTHODE
+                    // ===============================
+                    .requestMatchers(HttpMethod.POST, "/api/simulations").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/simulations").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/simulations/**").permitAll()
+                    .requestMatchers(HttpMethod.PUT, "/api/simulations/**").permitAll()
+                    .requestMatchers(HttpMethod.DELETE, "/api/simulations/**").permitAll()
+                    .requestMatchers(HttpMethod.POST, "/api/simulations/**").permitAll()  // ← /start, /end, /ia-move
+                    .requestMatchers(HttpMethod.GET, "/api/api/simulations/**/temps").permitAll()  // ← Ajouté pour autoriser l’accès GET /api/api/simulations/{id}/temps sans authentification
+
+
+
+
                     ////////////////hibaaa//////////////
                     .requestMatchers("/user/**").permitAll()  // ← TOUS LES ENDPOINTS USER
                     .requestMatchers("/test/**").permitAll()  // ← ENDPOINTS TEST
@@ -59,12 +76,8 @@ public class SecurityConfig {
                     .requestMatchers("/user/saveall", "/user/addwithconfpassword", "/user/addWTUN").authenticated()
                     .requestMatchers("/api/cours-modules").authenticated()
                     .requestMatchers("/api/cours-modules/").authenticated()
-                    // Ajout des endpoints pour Simulation - Nécessite authentification
-// Autoriser toutes les méthodes HTTP pour les endpoints de simulation
-                    .requestMatchers(HttpMethod.POST, "/api/simulations/**").permitAll()
-                    .requestMatchers(HttpMethod.GET, "/api/simulations/**").permitAll()
-                    .requestMatchers(HttpMethod.PUT, "/api/simulations/**").permitAll()
-                    .requestMatchers(HttpMethod.DELETE, "/api/simulations/**").permitAll()
+                    .requestMatchers(HttpMethod.POST,"/api/simulation/**").permitAll()
+                    .requestMatchers("/api/simulations/**").permitAll()
                     // Ajout des endpoints pour CarnetOrdre - Nécessite authentification
                     .requestMatchers("/api/carnets-ordre/**").permitAll()  // ← Ajouté pour tous les endpoints de CarnetOrdre
                     .requestMatchers(HttpMethod.POST, "/api/carnet-ordre/simulation/**").permitAll()
@@ -86,13 +99,6 @@ public class SecurityConfig {
                     .requestMatchers(HttpMethod.GET, "/api/actifs/**").permitAll()  // Get all et by ID
                     .requestMatchers(HttpMethod.PUT, "/api/actifs/**").permitAll()  // Update
                     .requestMatchers(HttpMethod.DELETE, "/api/actifs/**").permitAll()  // Delete
-                    // FIX : Explicit pour /analyse (GET /api/simulations/{id}/analyse) - Public sans auth
-                    .requestMatchers(HttpMethod.GET, "/api/simulations/*/analyse").permitAll()
-
-
-
-
-
 
                     // .requestMatchers("/post/**").hasAuthority(UserRoleName.ADMIN.name())
                     // .requestMatchers("/image/**").hasAnyAuthority(UserRoleName.USER.name(), UserRoleName.ADMIN.name())
@@ -100,7 +106,7 @@ public class SecurityConfig {
                     .anyRequest().authenticated())
     ;
 
-   http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+    http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
   }

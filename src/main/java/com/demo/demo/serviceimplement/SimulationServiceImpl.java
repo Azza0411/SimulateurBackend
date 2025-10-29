@@ -1,11 +1,14 @@
 package com.demo.demo.serviceimplement;
 
 import com.demo.demo.config.Config;
+import com.demo.demo.entities.ModeSimulation;
 import com.demo.demo.entities.Simulation;
 import com.demo.demo.entities.StatutSimulation;
 import com.demo.demo.repository.SimulationRepository;
 import com.demo.demo.services.SimulationService;
 import com.demo.demo.services.TradingAgentService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -35,14 +38,16 @@ public class SimulationServiceImpl implements SimulationService {
 
     @Autowired
     private SimulationRepository simulationRepository;
-    // private final TradingAgentService tradingAgentService; // Commenté si non utilisé (comme original)
+    @Autowired
+     private TradingAgentService tradingAgentService; //pour ia adverssaire
     @Autowired
     private RestTemplate restTemplate; // Pour fetch Yahoo RT (équiv. yfinance)
 
+
     @Value("${app.trading.export.dir}")
     private String exportDir; // Dossier export CSV (équiv. Config.EXPORT_DIR)
+    private final ObjectMapper mapper = new ObjectMapper();  // FIX : Mapper partagé (efficace)
 
-    // ... (Toutes les méthodes createSimulation, getSimulationById, getAllSimulations, updateSimulation, deleteSimulation, startSimulation, endSimulation, activateIaAdversaire, getRealTimeIaResponse inchangées - copiez de précédent)
 
     @Override
     public Simulation createSimulation(Simulation simulation) {
@@ -64,6 +69,18 @@ public class SimulationServiceImpl implements SimulationService {
         simulation.setCapitalActuel(simulation.getCapital());
         simulation.setFacteurTempsEcoule(0.0f);
         simulation.setAnalyseResultats("{}");
+        simulation.setHistoriqueTrades("[]");
+        simulation.setIaAdversaireActive(false);  // FIX : Init false pour éviter null
+        // === AJOUT : GESTION DE LA DURÉE DU MATCH (dureeJeuMinutes) ===
+        // Si pas renseigné ou valeur invalide → 3 min par défaut
+        Integer duree = simulation.getDureeJeuMinutes();
+        if (duree == null || duree < 1 || duree > 30) {
+            simulation.setDureeJeuMinutes(3); // 3 min = valeur sûre et fun
+            logger.info("Durée du match non valide ou absente → 3 min par défaut");
+        } else {
+            logger.info("Durée du match définie à {} minute(s)", duree);
+        }
+        // === FIN AJOUT ===
         return simulationRepository.save(simulation);
     }
 
@@ -73,8 +90,9 @@ public class SimulationServiceImpl implements SimulationService {
         if (optional.isEmpty()) {
             throw new RuntimeException("Simulation non trouvée avec ID : " + id);
         }
-        return optional.get();
-    }
+        Simulation sim = optional.get();
+        sim.setIaAdversaireActive(Optional.ofNullable(sim.getIaAdversaireActive()).orElse(false));  // FIX : Set safe après fetch
+        return sim;    }
 
     @Override
     public List<Simulation> getAllSimulations() {
@@ -85,6 +103,15 @@ public class SimulationServiceImpl implements SimulationService {
     public Simulation updateSimulation(Integer id, Simulation details) {
         Simulation simulation = simulationRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Simulation non trouvée avec ID : " + id));
+        // === AJOUT : INTERDIRE MODIF SI DÉJÀ DÉMARRÉE OU TERMINÉE + LOG ===
+        if (simulation.getStatutSimulation() == StatutSimulation.EXECUTEE ||
+                simulation.getStatutSimulation() == StatutSimulation.TERMINEE) {
+
+            String message = "Impossible de modifier une simulation déjà démarrée ou terminée (ID: " + id + ")";
+            logger.warn(message); // ← LOG EN WARN
+            throw new RuntimeException(message); // ← 400 + message clair
+
+        }
         if (details.getDescription() != null) simulation.setDescription(details.getDescription());
         if (details.getDuration() != null) simulation.setDuration(details.getDuration());
         if (details.getDifficulte() != null) simulation.setDifficulte(details.getDifficulte());
@@ -96,7 +123,21 @@ public class SimulationServiceImpl implements SimulationService {
         if (details.getModeSimulation() != null) simulation.setModeSimulation(details.getModeSimulation());
         if (details.getRisqueMaxAcceptable() != null) simulation.setRisqueMaxAcceptable(details.getRisqueMaxAcceptable());
         if (details.getCapitalParUser() != null) simulation.setCapitalParUser(details.getCapitalParUser());
-        if (details.getStatutSimulation() != null) simulation.setStatutSimulation(details.getStatutSimulation());
+        // === AJOUT : MODIFIER LA DURÉE DU MATCH (UNIQUEMENT EN ATTENTE) ===
+        if (details.getDureeJeuMinutes() != null) {
+            Integer duree = details.getDureeJeuMinutes();
+            if (duree < 1 || duree > 30) {
+                throw new RuntimeException("La durée du jeu doit être entre 1 et 30 minutes");
+            }
+            simulation.setDureeJeuMinutes(duree);
+            logger.info("Durée du match mise à jour : {} min pour simulation #{}", duree, id);
+        }
+        // === FIN AJOUT ===
+
+        if (details.getStatutSimulation() != null) {
+            simulation.setStatutSimulation(details.getStatutSimulation());
+        }
+
         return simulationRepository.save(simulation);
     }
 
@@ -113,9 +154,22 @@ public class SimulationServiceImpl implements SimulationService {
         if (simulation.getStatutSimulation() != StatutSimulation.EN_ATTENTE) {
             throw new RuntimeException("La simulation doit être en attente pour démarrer");
         }
+        // === AJOUT : CALCUL DE LA FIN DU MATCH ===
+        Integer dureeMinutes = simulation.getDureeJeuMinutes(); // 3 si absent
+        LocalDateTime debut = LocalDateTime.now();
+        simulation.setDateDebut(debut);
+        simulation.setDateFin(debut.plusMinutes(dureeMinutes)); // ← FIN À +3 min
+        simulation.setTempsRestantSecondes(dureeMinutes * 60); // 180s
+        logger.info("Match démarré : {} min → fin à {}", dureeMinutes, simulation.getDateFin());
+        // === FIN AJOUT ===
         simulation.setStatutSimulation(StatutSimulation.EXECUTEE);
         simulation.setDateDebut(LocalDateTime.now());
-        runForexAnalysisInSimulation(id);
+        runForexAnalysisInSimulation(id);//intiale
+        // FIX : Active IA si MONO
+        if (simulation.getModeSimulation() == ModeSimulation.MONOJOUEUR) {
+            tradingAgentService.activateIaAdversaire(id);
+            logger.info("🤖 IA Adversaire activée pour simu MONO #{}", id);
+        }
         return simulationRepository.save(simulation);
     }
 
@@ -133,13 +187,85 @@ public class SimulationServiceImpl implements SimulationService {
 
     @Override
     public void activateIaAdversaire(Integer simulationId) {
-        // Placeholder
+        tradingAgentService.activateIaAdversaire(simulationId);
+
     }
 
     @Override
     public String getRealTimeIaResponse(Integer simulationId, String userTrade, String asset) {
-        return "";
+        return tradingAgentService.getRealTimeIaResponse(simulationId, userTrade, asset);    }
+
+    // FIX : Tour humain vs IA
+    @Override
+    public Map<String, Object> playIaMove(Integer simulationId, Map<String, Object> humanTrade) {
+        Simulation sim = simulationRepository.findById(simulationId).orElseThrow();
+        // === AJOUT : VÉRIFIE SI LE TEMPS EST ÉCOULÉ ===
+        if (sim.getDateFin() != null && LocalDateTime.now().isAfter(sim.getDateFin())) {
+            sim.setStatutSimulation(StatutSimulation.TERMINEE);
+            sim.setTempsRestantSecondes(0);
+            simulationRepository.save(sim);
+            throw new RuntimeException("TEMPS ÉCOULÉ ! Le match est terminé.");
+        }
+
+        // Mise à jour du temps restant (pour le front)
+        if (sim.getDateFin() != null) {
+            long restant = java.time.Duration.between(LocalDateTime.now(), sim.getDateFin()).getSeconds();
+            sim.setTempsRestantSecondes((int) Math.max(0, restant));
+        }
+        // === FIN AJOUT ===
+        if (Boolean.FALSE.equals(Optional.ofNullable(sim.getIaAdversaireActive()).orElse(false)) || sim.getModeSimulation() != ModeSimulation.MONOJOUEUR) {  // FIX : Null-safe Boolean.FALSE.equals + orElse(false)
+            throw new RuntimeException("IA adversaire non active (mode MONOJOUEUR seulement)");
+
+        }
+        String asset = (String) humanTrade.get("asset");
+        String userTradeJson = null;
+        try {
+            userTradeJson = mapper.writeValueAsString(humanTrade);
+        } catch (JsonProcessingException e) {
+            logger.error("JSON write error for humanTrade: {}", e.getMessage());
+            throw new RuntimeException("Invalid human trade JSON");
+        }
+        String iaResponse = tradingAgentService.getRealTimeIaResponse(simulationId, userTradeJson, asset);
+        Map<String, Object> iaTrade = null;
+        try {
+            iaTrade = mapper.readValue(iaResponse, Map.class);
+        } catch (JsonProcessingException e) {
+            logger.error("JSON parse error for IA response: {}", e.getMessage());
+            iaTrade = fallbackIaTrade();
+        }
+        Float pnlHuman = (float) (Math.random() * 100 - 50);
+        tradingAgentService.updateScoreIaVsUser(simulationId, pnlHuman);
+        List<Map<String, Object>> historique = null;
+        try {
+            historique = mapper.readValue(sim.getHistoriqueTrades(), List.class);
+        } catch (JsonProcessingException e) {
+            logger.error("Historique parse error: {}", e.getMessage());
+            historique = new ArrayList<>();  // Fallback empty
+        }
+        Map<String, Object> tour = Map.of("tour", historique.size() + 1, "human", humanTrade, "ia", iaTrade);
+        historique.add(tour);
+        try {
+            sim.setHistoriqueTrades(mapper.writeValueAsString(historique));
+        } catch (JsonProcessingException e) {
+            logger.error("Historique write error: {}", e.getMessage());
+            sim.setHistoriqueTrades("[]");
+        }
+        simulationRepository.save(sim);
+        Map<String, Object> response = new HashMap<>();
+        response.put("tour", tour);
+        response.put("scoreIaVsUser", sim.getScoreIaVsUser());
+        return response;
     }
+
+    private Map<String, Object> fallbackIaTrade() {
+        return Map.of(
+                "tradeType", "ACHAT",
+                "quantity", 100.0,
+                "price", 1.08,
+                "stopLoss", 1.06,
+                "takeProfit", 1.09,
+                "reason", "Fallback : Contre-trade basique (risque 2%)"
+        );}
 
     // (runForexAnalysisInSimulation, updateActiveSimulations, getData, cleanData, resampleTo4h, getFallbackData inchangées - copiez de précédent)
 

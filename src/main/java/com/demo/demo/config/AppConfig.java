@@ -11,36 +11,37 @@ import org.springframework.http.client.ClientHttpRequestInterceptor;
 
 import java.util.Collections;
 
-/**
- * Configuration beans globaux.
- * RestTemplate : Pour fetch données Yahoo Finance (temps réel, remplace yfinance).
- * FIX : Interceptor pour headers par défaut (User-Agent anti-blocage Yahoo, évite fallback).
- */
 @Configuration
 public class AppConfig {
+
     @Bean
     public RestTemplate restTemplate() {
-        RestTemplate restTemplate = new RestTemplate(clientHttpRequestFactory());  // Avec factory pour timeout
+        RestTemplate restTemplate = new RestTemplate(clientHttpRequestFactory());
 
-        // FIX : Interceptor pour ajouter headers par défaut à chaque requête (pas de setDefaultHeaders)
+        // INTERCEPTOR : Ajoute headers + LOG L'URL
         ClientHttpRequestInterceptor interceptor = (request, body, execution) -> {
             HttpHeaders headers = new HttpHeaders();
             headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-            headers.set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36");  // Anti-blocage Yahoo
+            headers.set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
+            headers.set("Content-Type", "application/json");
+
             request.getHeaders().addAll(headers);
+
+            // LOGGING : Affiche l'URL appelée
+            System.out.println("REST CALL → " + request.getMethod() + " " + request.getURI());
+
             return execution.execute(request, body);
         };
-        restTemplate.getInterceptors().add(interceptor);  // Ajoute interceptor
 
+        restTemplate.getInterceptors().add(interceptor);
         return restTemplate;
     }
 
-    // Factory pour timeout (évite hang sur fetch lent)
     @Bean
     public ClientHttpRequestFactory clientHttpRequestFactory() {
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
-        factory.setConnectTimeout(5000);  // 5s
-        factory.setReadTimeout(10000);    // 10s
+        factory.setConnectTimeout(45000);  // 45s
+        factory.setReadTimeout(45000);     // 45s
         return factory;
     }
 }

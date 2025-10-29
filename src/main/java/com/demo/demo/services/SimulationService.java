@@ -18,4 +18,6 @@ SimulationService {
     // Nouvelles pour IA temps réel en MONO
     void activateIaAdversaire(Integer simulationId); // Active IA en salle
     String getRealTimeIaResponse(Integer simulationId, String userTrade, String asset); // Réponse IA live
+    // FIX : Tour humain vs IA (trade humain → contre IA + score)
+    Map<String, Object> playIaMove(Integer simulationId, Map<String, Object> humanTrade); // Retourne {"human":..., "ia":..., "score":...}
     void runForexAnalysisInSimulation(Integer simulationId);}// MODIF : Trigger forex JSON/gains

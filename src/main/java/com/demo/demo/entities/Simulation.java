@@ -1,6 +1,7 @@
 package com.demo.demo.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -26,14 +27,22 @@ private typeSimulation typeSimulation;
     @Enumerated(EnumType.STRING)
     private difficulte difficulte;
 private Float capital;
+    // === AJOUT : TEMPS DU MATCH JOUEUR vs IA (MONOJOUEUR) ===
+    @Column(name = "duree_jeu_minutes")
+    private Integer dureeJeuMinutes; // Ex: 1, 3, 5 min → null = 3 min par défaut
 private Float vitesseExecution;
 private Float volatiliteMarche;
 private Float volumeEchange;
     @Enumerated(EnumType.STRING)
 private regleSimulation regleSimulation ;
     @Enumerated(EnumType.STRING)
+    @Column(name = "mode_simulation")
+    @JsonProperty("ModeSimulation")  // ← Accepte "ModeSimulation" dans le JSON
+    private ModeSimulation modeSimulation;
 
-    private ModeSimulation ModeSimulation;
+
+    @Column(name = "temps_restant_secondes")
+    private Integer tempsRestantSecondes; // Mis à jour à chaque tour
     /// nv attributs//////////////////
     private LocalDateTime dateDebut; //Timestamp de début pour suivre l'état en temps réel.
 
@@ -49,7 +58,7 @@ private regleSimulation regleSimulation ;
     //@Transient
     //private String forexSignalsJson;  // JSON signals pour sim
     // Nouveaux attributs pour IA en temps réel
-    @Column(name = "ia_adversaire_active")
+    @Column(name = "ia_adversaire_active", columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean iaAdversaireActive = false; // Activé en MONO
     @Column(name = "dernier_trade_ia", columnDefinition = "TEXT")
     private String dernierTradeIa; // Stocke dernier move IA (JSON)
@@ -58,6 +67,9 @@ private regleSimulation regleSimulation ;
     // AJOUT CORRECTION : Champ pour JSON dashboard forex (équiv. export Python, TEXT pour gros JSON)
     @Column(name = "analyse_resultats", columnDefinition = "TEXT")
     private String analyseResultats;
+    // FIX : Historique trades pour IA (JSON array tours humain/IA)
+    @Column(name = "historique_trades", columnDefinition = "TEXT")
+    private String historiqueTrades = "[]";  // Array JSON [{"tour":1,"human":{"type":"ACHAT"},"ia":{"type":"VENTE"}}]
     // 🔹 Many-to-Many avec UserEntity
     @ManyToMany(mappedBy = "simulationsParticipees")
     private Set<UserEntity> users = new HashSet<>();
@@ -112,6 +124,14 @@ private regleSimulation regleSimulation ;
 
     public void setIaAdversaireActive(Boolean iaAdversaireActive) {
         this.iaAdversaireActive = iaAdversaireActive;
+    }
+
+    public Integer getDureeJeuMinutes() {
+        return dureeJeuMinutes;
+    }
+
+    public void setDureeJeuMinutes(Integer dureeJeuMinutes) {
+        this.dureeJeuMinutes = dureeJeuMinutes;
     }
 
     public String getDernierTradeIa() {
@@ -212,6 +232,14 @@ private regleSimulation regleSimulation ;
         this.transactions = transactions;
     }
 
+    public Integer getTempsRestantSecondes() {
+        return tempsRestantSecondes;
+    }
+
+    public void setTempsRestantSecondes(Integer tempsRestantSecondes) {
+        this.tempsRestantSecondes = tempsRestantSecondes;
+    }
+
     public Set<CarnetOrdre> getCarnetsOrdre() {
         return carnetsOrdre;
     }
@@ -226,6 +254,14 @@ private regleSimulation regleSimulation ;
 
     public com.demo.demo.entities.difficulte getDifficulte() {
         return difficulte;
+    }
+
+    public String getHistoriqueTrades() {
+        return historiqueTrades;
+    }
+
+    public void setHistoriqueTrades(String historiqueTrades) {
+        this.historiqueTrades = historiqueTrades;
     }
 
     public void setDifficulte(com.demo.demo.entities.difficulte difficulte) {
@@ -272,12 +308,12 @@ private regleSimulation regleSimulation ;
         this.regleSimulation = regleSimulation;
     }
 
-    public com.demo.demo.entities.ModeSimulation getModeSimulation() {
-        return ModeSimulation;
+    public ModeSimulation getModeSimulation() {
+        return modeSimulation;
     }
 
-    public void setModeSimulation(com.demo.demo.entities.ModeSimulation modeSimulation) {
-        ModeSimulation = modeSimulation;
+    public void setModeSimulation(ModeSimulation modeSimulation) {
+        this.modeSimulation = modeSimulation;
     }
 
     public String getAnalyseResultats() {
