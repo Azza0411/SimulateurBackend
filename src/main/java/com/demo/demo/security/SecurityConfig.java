@@ -1,5 +1,6 @@
 package com.demo.demo.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -12,8 +13,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import static org.springframework.security.config.Customizer.withDefaults;
+
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
@@ -22,6 +27,9 @@ public class SecurityConfig {
   private final JwtAuthEntryPoint authEntryPoint;
   private final CustoUserDetailsService userDetailsService;
 
+  @Autowired
+  private JWTAuthenticationFilter jwtAuthenticationFilter;  // Injection auto
+
   public SecurityConfig(CustoUserDetailsService userDetailsService, JwtAuthEntryPoint authEntryPoint) {
     this.userDetailsService = userDetailsService;
     this.authEntryPoint = authEntryPoint;
@@ -29,85 +37,34 @@ public class SecurityConfig {
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
     http.cors(withDefaults())
-            // Disable Cross-Site Request Forgery (CSRF) protection
             .csrf(csrf -> csrf.disable())
             .exceptionHandling(exception -> exception
                     .authenticationEntryPoint(authEntryPoint))
             .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-
-                    // FIX : Accès public pour /api/simulations/** EN HAUT (priorité, couvre POST, GET, /end, /analyse, /ia-move)
-                    .requestMatchers("/api/simulations/**").permitAll()  // ← FIX : Tout simulations public (401 résolu pour POST /api/simulations)
-
-                    // Swagger/OpenAPI - Accès public
-                    .requestMatchers(
-                            "/swagger-ui.html",
-                            "/swagger-ui/**",
-                            "/v3/api-docs/**",
-                            "/swagger-resources/**",
-                            "/webjars/**",
-                            "/configuration/ui",
-                            "/configuration/security"
-                    ).permitAll()
-                    // API Auth - Accès public
-                    .requestMatchers("/api/auth/**").permitAll()
-                    .requestMatchers("/api/cours-modules/**").permitAll()  // ← Ajouté ici pour autoriser /api/cours-modules sans auth
-                    // ===============================
-                    // SIMULATIONS - UNE LIGNE PAR MÉTHODE
-                    // ===============================
+                    // FIX : Login public (full /api/auth/** pour matcher /api/auth/login)
+                    .requestMatchers("/api/auth/**").permitAll()  // ← LE FIX EN 1 LIGNE
+                    // Autres public (add user, etc. – ajoute /api si pas déjà)
+                    .requestMatchers("/api/user/add", "/api/user/addwithconfpassword", "/api/user/all", "/api/user/findbyid/**", "/api/user/findbyusername/**").permitAll()
+                    .requestMatchers("/images/**").permitAll()
+                    .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**", "/configuration/ui", "/configuration/security").permitAll()
+                    .requestMatchers("/test/**").permitAll()
+                    // Simulations, CRUD, etc. (inchangé)
                     .requestMatchers(HttpMethod.POST, "/api/simulations").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/simulations").permitAll()
-                    .requestMatchers(HttpMethod.GET, "/api/simulations/**").permitAll()
-                    .requestMatchers(HttpMethod.PUT, "/api/simulations/**").permitAll()
-                    .requestMatchers(HttpMethod.DELETE, "/api/simulations/**").permitAll()
-                    .requestMatchers(HttpMethod.POST, "/api/simulations/**").permitAll()  // ← /start, /end, /ia-move
-                    .requestMatchers(HttpMethod.GET, "/api/api/simulations/**/temps").permitAll()  // ← Ajouté pour autoriser l’accès GET /api/api/simulations/{id}/temps sans authentification
-
-
-
-
-                    ////////////////hibaaa//////////////
-                    .requestMatchers("/user/**").permitAll()  // ← TOUS LES ENDPOINTS USER
-                    .requestMatchers("/test/**").permitAll()  // ← ENDPOINTS TEST
-                    .requestMatchers("/user/updateuser/**").authenticated()            // Modif besoin auth
-                    .requestMatchers("/user/delete/**").authenticated()                // Suppression besoin auth
-                    .requestMatchers("/user/saveall", "/user/addwithconfpassword", "/user/addWTUN").authenticated()
-                    .requestMatchers("/api/cours-modules").authenticated()
-                    .requestMatchers("/api/cours-modules/").authenticated()
-                    .requestMatchers(HttpMethod.POST,"/api/simulation/**").permitAll()
-                    .requestMatchers("/api/simulations/**").permitAll()
-                    // Ajout des endpoints pour CarnetOrdre - Nécessite authentification
-                    .requestMatchers("/api/carnets-ordre/**").permitAll()  // ← Ajouté pour tous les endpoints de CarnetOrdre
-                    .requestMatchers(HttpMethod.POST, "/api/carnet-ordre/simulation/**").permitAll()
-                    .requestMatchers(HttpMethod.GET, "/api/carnet-ordre/**").permitAll()
-                    .requestMatchers(HttpMethod.PUT, "/api/carnet-ordre/**").permitAll()
-                    .requestMatchers(HttpMethod.DELETE, "/api/carnet-ordre/**").permitAll()
-                    .requestMatchers(HttpMethod.POST, "/api/carnet-ordre/*/execute").permitAll()
-                    .requestMatchers(HttpMethod.GET, "/api/carnet-ordre/simulation/*/pending").permitAll()
-                    .requestMatchers(HttpMethod.POST, "/api/carnet-ordre/simulation/*/match").permitAll()
-                    .requestMatchers(HttpMethod.POST, "/api/carnet-ordre/*/execute").permitAll()
-                    .requestMatchers("/api/transactions/**").permitAll()  // FIX : Tout public pour tests
-                    .requestMatchers(HttpMethod.POST,"/api/transactions/**").permitAll()
-                    .requestMatchers(HttpMethod.POST, "/api/transactions").permitAll()  // Create
-                    .requestMatchers(HttpMethod.GET, "/api/transactions/**").permitAll()  // Get all et by ID
-                    .requestMatchers(HttpMethod.PUT, "/api/transactions/**").permitAll()  // Update
-                    .requestMatchers(HttpMethod.DELETE, "/api/transactions/**").permitAll()  // Delete
-                    .requestMatchers("/api/actifs/**").permitAll()  // FIX : Tout public pour tests
-                    .requestMatchers(HttpMethod.POST, "/api/actifs").permitAll()  // Create
-                    .requestMatchers(HttpMethod.GET, "/api/actifs/**").permitAll()  // Get all et by ID
-                    .requestMatchers(HttpMethod.PUT, "/api/actifs/**").permitAll()  // Update
-                    .requestMatchers(HttpMethod.DELETE, "/api/actifs/**").permitAll()  // Delete
-
-                    // .requestMatchers("/post/**").hasAuthority(UserRoleName.ADMIN.name())
-                    // .requestMatchers("/image/**").hasAnyAuthority(UserRoleName.USER.name(), UserRoleName.ADMIN.name())
+                    .requestMatchers("/api/simulations/**").hasAnyAuthority("TRADER", "ADMIN")
+                    .requestMatchers("/api/transactions/**").hasAnyAuthority("TRADER", "ADMIN")
+                    .requestMatchers("/api/actifs/**").hasAnyAuthority("TRADER", "ADMIN")
+                    .requestMatchers("/api/carnets-ordre/**").hasAnyAuthority("TRADER", "ADMIN")
+                    .requestMatchers("/api/cours-modules/**").hasAnyAuthority("TRADER", "ADMIN")
+                    .requestMatchers("/api/user/updateuser/**").authenticated()
+                    .requestMatchers("/api/user/delete/**").authenticated()
+                    .requestMatchers("/api/user/saveall", "/api/user/addwithconfpassword", "/api/user/addWTUN").authenticated()
                     .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                    .anyRequest().authenticated())
-    ;
-
-    http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
-
+                    .anyRequest().permitAll()
+            );
+    http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
     return http.build();
   }
 
@@ -122,7 +79,14 @@ public class SecurityConfig {
   }
 
   @Bean
-  public JWTAuthenticationFilter jwtAuthenticationFilter() {
-    return new JWTAuthenticationFilter();
+  public CorsConfigurationSource corsConfigurationSource() {
+    CorsConfiguration configuration = new CorsConfiguration();
+    configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200"));
+    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+    configuration.setAllowedHeaders(Arrays.asList("*"));
+    configuration.setAllowCredentials(true);
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/**", configuration);
+    return source;
   }
 }

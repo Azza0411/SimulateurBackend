@@ -27,6 +27,11 @@ public class CustoUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         UserEntity user = userRepo.findByUsername(username);
+        if (user == null) {
+            System.out.println("DEBUG: User NULL - Not found!");
+            throw new UsernameNotFoundException("User not found");}
+        System.out.println("DEBUG: User found, password starts with: " + user.getPassword().substring(0, 10));
+        System.out.println("DEBUG: Role: " + (user.getRole() != null ? user.getRole().getRolename() : "NULL"));
         return new User(user.getUsername(),user.getPassword(), mapRolesToAuthorities(user.getRole()));
 
     }

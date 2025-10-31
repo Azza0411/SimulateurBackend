@@ -1,90 +1,63 @@
 package com.demo.demo.controllers;
 
-import com.demo.demo.entities.RoleName;
-import com.demo.demo.entities.UserEntity;
+import com.demo.demo.DTO.RegisterDto;
 import com.demo.demo.services.UserInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.*;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 @RestController
-@RequestMapping("user")
+@RequestMapping("/user")
+@CrossOrigin(origins = "http://localhost:4200")
 public class UserController {
+
     @Autowired
-    UserInterface userInterface;
+    private UserInterface userInterface;
 
-    @GetMapping("afficher")
-    public String user(){
-        return "Hey nour";
-    }
-    @GetMapping("users")
-    public ResponseEntity<Map<String,Object>> getUser(){
-        Map<String,Object> response= new HashMap<>();
-        response.put("status","ok");
-        List<String> users= new ArrayList<>();
-        users.add("john");
-        users.add("john");
-        users.add("mary");
-        users.add("jane");
-        Set<String> users1= new HashSet<>();
-        users1.add("john");
-        users1.add("john");
-        users1.add("mary");
-        users1.add("jane");
-        response.put("data",users);
-        response.put("data2",users1);
-        return ResponseEntity.ok(response);
-    }
-    @PostMapping("add")
-    public UserEntity addUser(@RequestBody UserEntity user){
-        return userInterface.adduser(user);
-    }
-    @DeleteMapping("delete/{id}")
-    public void deleteUser(@PathVariable Long id){
-        userInterface.deletedUser(id);
-    }
-    @DeleteMapping("delete")
-    public void deleteUserz(@RequestParam("a") Long id){
-        userInterface.deletedUser(id);
-    }
-     @PostMapping("saveall")
-     public List<UserEntity> addListUsers(@RequestBody List<UserEntity> users){
-        return userInterface.AddListUsers(users);
-     }
-     @PostMapping("addwithconfpassword")
-    public String addUserWithConfPassword(@RequestBody UserEntity user){
-        return userInterface.addUserWTCP(user);
-     }
-      @PostMapping("addWTUN")
-    public String addUserWTUN(@RequestBody UserEntity user){
-        return userInterface.addUserWTUN(user);
-      }
-      @PutMapping("updateuser/{id}")
-    public UserEntity  updateuser(@PathVariable Long id, @RequestBody UserEntity user){
-        return userInterface.UpdateUser(user,id);
-      }
-      @GetMapping("all")
-    public List<UserEntity> getAllUser(){
-        return userInterface.getAllUsers();
-      }
-      @GetMapping("findbyusername/{abc}")
-    public UserEntity getUserByUsername(@PathVariable("abc") String u){
-        return userInterface.getUserByUsername(u);
-      }
-      @GetMapping("findbyid/{id}")
-    public UserEntity getUserById(@PathVariable Long id){
-        return userInterface.getUserById(id);
-      }
-      @GetMapping("getuserswt/{cle}")
-    public List<UserEntity> getUserSW(@PathVariable String cle){
-        return userInterface.getUserSWT(cle);
+    private static final String PDP_DIR = "PDP";
 
-      }
-    @GetMapping("getuserbyemaildomaine")
-    public List<UserEntity> getUserbyemaildom(@RequestParam String cle){
-        return userInterface.getUserByEmail(cle);
+    @PostMapping("/addwithconfpassword")
+    public ResponseEntity<?> addUserWithConfPassword(
+            @RequestPart("user") RegisterDto userDto,
+            @RequestPart(value = "image", required = false) MultipartFile imageFile
+    ) {
+        try {
+            // Crée le dossier PDP s’il n’existe pas
+            File dir = new File(PDP_DIR);
+            if (!dir.exists()) dir.mkdirs();
 
+            if (imageFile != null && !imageFile.isEmpty()) {
+                // 🔹 Détermine l’extension de l’image
+                String originalName = imageFile.getOriginalFilename();
+                String extension = originalName.substring(originalName.lastIndexOf("."));
+                if (extension == null || extension.isEmpty()) {
+                    extension = ".png"; // fallback
+                }
+
+                // 🔹 Nom final = username + extension
+                String fileName = userDto.getUsername() + extension;
+
+                // 🔹 Copie du fichier
+                String filePath = PDP_DIR + File.separator + fileName;
+                Files.copy(imageFile.getInputStream(), Paths.get(filePath));
+
+                // 🔹 On stocke seulement le nom du fichier
+                userDto.setImageUrl(fileName);
+            }
+
+            String result = userInterface.addUserWTCP(userDto);
+            return ResponseEntity.ok(result);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError()
+                    .body("Erreur lors de la création du compte : " + e.getMessage());
+        }
     }
-   }
+}

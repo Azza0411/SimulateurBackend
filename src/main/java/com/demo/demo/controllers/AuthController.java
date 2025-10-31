@@ -1,10 +1,6 @@
 package com.demo.demo.controllers;
 
-
-
-import com.demo.demo.DTO.AuthResponseDto;
 import com.demo.demo.DTO.LoginDto;
-import com.demo.demo.entities.Role;
 import com.demo.demo.entities.RoleName;
 import com.demo.demo.entities.UserEntity;
 import com.demo.demo.repository.RoleRepository;
@@ -19,22 +15,18 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
-import java.util.Optional;
+import java.util.Map;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/auth")
 @CrossOrigin(origins = "*", allowedHeaders = "*")
-
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
     private final UserRepo userRepository;
-
     private final PasswordEncoder passwordEncoder;
     private final JWTGenerator jwtGenerator;
     private final RoleRepository roleRepository;
@@ -50,84 +42,38 @@ public class AuthController {
         this.jwtGenerator = jwtGenerator;
     }
 
-
-
-    @PostConstruct
-    public void createDefaultAdminAccount() {
-        if (!userRepository.existsByUsername("admin")) {
-            UserEntity adminUser = new UserEntity();
-            adminUser.setUsername("admin");
-            adminUser.setEmail("admin@bridge.com");
-            adminUser.setPassword(passwordEncoder.encode("admin")); // You can change the default password
-            adminUser.setFirstName("Admin");
-            adminUser.setLastName("Bridge");
-            adminUser.setAddress("tunis");
-
-            // Vérifie si le rôle ADMIN existe déjà
-            Role adminRole = roleRepository.findByRolename(RoleName.ADMIN)
-                    .orElseGet(() -> {
-                        Role newRole = new Role();
-                        newRole.setRolename(RoleName.ADMIN);
-                        return roleRepository.save(newRole);
-                    });
-
-            // Associer le rôle à l’admin
-            adminUser.setRole(adminRole);
-
-            userRepository.save(adminUser);
-        }
-
-
-
-    }
-
-
-
-    @PostMapping("login")
+    @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginDto loginDto) {
+        System.out.println("DEBUG: Login attempt for: " + loginDto.getUsername());
         try {
-            // 1. Essayer d'authentifier l'utilisateur avec son nom d'utilisateur et son mot de passe
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
-                            loginDto.getUsername(),  // Nom d'utilisateur récupéré du corps de la requête
-                            loginDto.getPassword()   // Mot de passe récupéré du corps de la requête
+                            loginDto.getUsername(),
+                            loginDto.getPassword()
                     )
             );
-
-            // 2. Si l'authentification réussit, la session est associée à l'utilisateur authentifié
-            // L'authentification réussie est enregistrée dans le contexte de sécurité
+            System.out.println("DEBUG: Auth SUCCESS");
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            // 3. Récupérer les détails de l'utilisateur authentifié
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-
-            // 4. Générer un token JWT pour l'utilisateur authentifié
+            UserEntity user = userRepository.findByUsername(loginDto.getUsername());
             String token = jwtGenerator.generateToken(authentication);
+            String page = (user.getRole().getRolename() == RoleName.ADMIN) ? "back" : "front";
 
-            // 5. Chercher l'utilisateur dans la base de données en utilisant le nom d'utilisateur
-            UserEntity user= userRepository.findByUsername(userDetails.getUsername());
+            // ✅ Construit l’URL simple selon le username
+            String imageUrl = "http://localhost:8082/api/images/" + user.getUsername() + ".png";
+            user.setImage(imageUrl);
 
-            // 6. Vérifier si l'utilisateur existe dans la base de données
+            Map<String, Object> response = Map.of(
+                    "token", token,
+                    "user", user,
+                    "page", page
+            );
 
-
-            // 7. Créer une réponse contenant le token et l'utilisateur
-            AuthResponseDto authResponseDTO = new AuthResponseDto(token, user);
-
-            // 8. Retourner une réponse HTTP avec le token et les informations de l'utilisateur
-            return new ResponseEntity<>(authResponseDTO, HttpStatus.OK);
-
+            return ResponseEntity.ok(response);
 
         } catch (AuthenticationException e) {
-            // 10. Si l'authentification échoue (nom d'utilisateur ou mot de passe incorrect)
-            // Retourner une réponse HTTP indiquant que l'authentification a échoué
+            System.out.println("DEBUG: Auth FAILED: " + e.getMessage());
             return new ResponseEntity<>("Invalid username or password", HttpStatus.UNAUTHORIZED);
         }
     }
-
-
-
-
-
-
-
 }
