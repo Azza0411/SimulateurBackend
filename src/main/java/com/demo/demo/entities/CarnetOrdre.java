@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Data
-@Table(name="carnet-ordre ")
+@Table(name="carnet_ordre ")
 public class CarnetOrdre {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,14 +22,24 @@ private typeTransaction typeTransaction;
 
     // Null si market
     private Double prixLimite;
+   //Stop Loss pour protection risque (annule si prix hit).
+    private Double stopLoss;
+    //Take Profit pour sécuriser gain (exécute auto si hit).
+    private Double takeProfit;
 
     private LocalDateTime dateCreation;
     private LocalDateTime dateExecution;
-
+    private LocalDateTime dateUpdate;
     private Double prixAchat; // si typeOrdre = ACHAT
     private Double prixVente; // si typeOrdre = VENTE
+    // AJOUT : Paire (lien GARCH/dashboard).
+    private String paire;
 
+    // AJOUT : Raison (e.g., "GARCH basse").
+    private String raison;
     private Double gain;
+    // AJOUT : Frais % (soustrait de gain).
+    private Float fees;
     private Float risque; // Risque associé à l'ordre (ajouté pour évaluation)
     @Enumerated(EnumType.STRING)
     private ModeValidation modeValidation; // Mode de validation (AUTOMATIQUE/MANUEL)
@@ -81,6 +91,54 @@ private typeTransaction typeTransaction;
 
     public Double getPrixLimite() {
         return prixLimite;
+    }
+
+    public Double getStopLoss() {
+        return stopLoss;
+    }
+
+    public void setStopLoss(Double stopLoss) {
+        this.stopLoss = stopLoss;
+    }
+
+    public Double getTakeProfit() {
+        return takeProfit;
+    }
+
+    public void setTakeProfit(Double takeProfit) {
+        this.takeProfit = takeProfit;
+    }
+
+    public LocalDateTime getDateUpdate() {
+        return dateUpdate;
+    }
+
+    public void setDateUpdate(LocalDateTime dateUpdate) {
+        this.dateUpdate = dateUpdate;
+    }
+
+    public String getPaire() {
+        return paire;
+    }
+
+    public void setPaire(String paire) {
+        this.paire = paire;
+    }
+
+    public String getRaison() {
+        return raison;
+    }
+
+    public void setRaison(String raison) {
+        this.raison = raison;
+    }
+
+    public Float getFees() {
+        return fees;
+    }
+
+    public void setFees(Float fees) {
+        this.fees = fees;
     }
 
     public void setPrixLimite(Double prixLimite) {

@@ -4,6 +4,7 @@ import com.demo.demo.entities.*;
 import com.demo.demo.repository.CarnetOrdreRepository;
 import com.demo.demo.repository.SimulationRepository;
 import com.demo.demo.services.CarnetOrdreService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -25,7 +26,7 @@ public class CarnetOrdreServiceImpl implements CarnetOrdreService {
     private CarnetOrdreRepository carnetOrdreRepository;
     @Autowired
     private SimulationRepository simulationRepository;
-
+    private final ObjectMapper mapper = new ObjectMapper(); // AJOUT : Pour GARCH JSON.
     @Override
     public CarnetOrdre createCarnetOrdre(Integer simulationId, CarnetOrdre carnetOrdre) {
         // Vérif simulation
@@ -71,9 +72,6 @@ public class CarnetOrdreServiceImpl implements CarnetOrdreService {
     }
 
 
-
-
-
     @Override
     public CarnetOrdre updateCarnetOrdre(Integer id, CarnetOrdre details) {
         CarnetOrdre carnetOrdre = getCarnetOrdreById(id);
@@ -83,7 +81,8 @@ public class CarnetOrdreServiceImpl implements CarnetOrdreService {
         if (details.getStatusOrdre() != null) carnetOrdre.setStatusOrdre(details.getStatusOrdre());
         if (details.getModeValidation() != null) carnetOrdre.setModeValidation(details.getModeValidation());
         if (details.getRisque() != null) carnetOrdre.setRisque(details.getRisque());
-        return carnetOrdreRepository.save(carnetOrdre);    }
+        return carnetOrdreRepository.save(carnetOrdre);
+    }
 
     @Override
     public void deleteCarnetOrdre(Integer id) {
@@ -102,7 +101,8 @@ public class CarnetOrdreServiceImpl implements CarnetOrdreService {
         if (!simulationRepository.existsById(simulationId)) {
             throw new IllegalArgumentException("Simulation non trouvée avec ID : " + simulationId);
         }
-        return carnetOrdreRepository.findPendingBySimulationId(simulationId, statusOrdre.EN_ATTENTE);    }
+        return carnetOrdreRepository.findPendingBySimulationId(simulationId, statusOrdre.EN_ATTENTE);
+    }
 
     @Override
     public List<CarnetOrdre> matchOrders(Integer simulationId, Double prixMarche) {
@@ -123,17 +123,22 @@ public class CarnetOrdreServiceImpl implements CarnetOrdreService {
                 }
             }
         }
-        return matched;    }
+        return matched;
+    }
+
     private Double calculateGain(CarnetOrdre ordre) {
         Double prixAchatPrev = ordre.getPrixAchat() != null ? ordre.getPrixAchat() : 0.0;
         if (ordre.getTypeT() == typeT.VENTE && ordre.getPrixVente() != null) {
             return (ordre.getPrixVente() - prixAchatPrev) * ordre.getQuantite();
         }
-        return 0.0;}
+        return 0.0;
+    }
+
     private Float calculateRisque(CarnetOrdre ordre) {
         Simulation sim = ordre.getSimulation();
         if (sim.getVolatiliteMarche() != null) {
             return (float) (ordre.getQuantite() * sim.getVolatiliteMarche() * 0.01);
         }
-        return 0.0f;}
+        return 0.0f;
+    }
 }

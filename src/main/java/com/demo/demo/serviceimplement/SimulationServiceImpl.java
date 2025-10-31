@@ -526,23 +526,55 @@ public class SimulationServiceImpl implements SimulationService {
     }
 
     /**
-     * assessVolatility : FIX - Calcul manuel std dev (pas de getStandardDeviation()).
-     * Équiv. Python returns.rolling(14).std().iloc[-1].
+     * assessVolatility : NOUVEAU GARCH(1,1) - Prédiction vol temps réel sur données fraîches Yahoo.
+     * Utilise log-returns des DERNIÈRES 30 bougies (récent pour réactivité, comme RSI=14).
+     * À chaque run: fetch Yahoo → closes fraîches → GARCH sur fenêtre récente → score 0-1.
+     * Pour TOUTES paires (via boucle Config.PAIRS). Prédit σ_t future pour estimations (range ±2σ).
      */
     private double assessVolatility(double[] prices) {
+        if (prices.length < 20) {  // Min pour init stable (comme avant)
+            return 0.5;  // Neutre si données insuffisantes
+        }
+
+        // 1. Log-returns sur full closes (données fraîches de getData()/Yahoo)
         double[] returns = new double[prices.length - 1];
         for (int i = 1; i < prices.length; i++) {
-            returns[i - 1] = (prices[i] - prices[i - 1]) / prices[i - 1];
+            if (prices[i - 1] > 0) {  // Safe: évite log(0), rare en forex
+                returns[i - 1] = Math.log(prices[i] / prices[i - 1]);
+            } else {
+                returns[i - 1] = 0.0;  // Fallback neutre
+            }
         }
-        int period = 14;
-        if (returns.length < period) return 0.5;
-        double[] recentReturns = Arrays.copyOfRange(returns, returns.length - period, returns.length);
-        double mean = DoubleStream.of(recentReturns).average().orElse(0.0);
-        double variance = DoubleStream.of(recentReturns).map(r -> Math.pow(r - mean, 2)).average().orElse(0.0);
-        double volatility = Math.sqrt(variance);  // FIX : Calcul manuel std dev
-        if (volatility > 0.008) return 0.8;
-        if (volatility < 0.003) return 0.3;
-        return 0.5;
+
+        // 2. Fenêtre RECENTE: 30 dernières (réactif temps réel ; tunable si besoin)
+        int window = 30;  // Comme ton period=14, mais + pour GARCH mémoire
+        int n = Math.min(window, returns.length);
+        double[] recentReturns = Arrays.copyOfRange(returns, returns.length - n, returns.length);
+
+        // 3. Moyenne returns (pour résidus ε)
+        double meanReturn = DoubleStream.of(recentReturns).average().orElse(0.0);
+
+        // 4. Init variance (échantillon simple sur fenêtre, >0)
+        double[] epsilonInit = DoubleStream.of(recentReturns).map(r -> r - meanReturn).toArray();
+        double initVar = DoubleStream.of(epsilonInit).map(e -> e * e).average().orElse(0.0001);
+
+        // 5. Params GARCH fixes (adaptés forex: persistence haute pour trends longs)
+        double omega = 0.0001;  // Variance fond (stable EURUSD etc.)
+        double alpha = 0.1;     // Choc récent (10% impact spike)
+        double beta = 0.85;     // Héritage passé (85%, <1 pour stabilité)
+
+        // 6. Itération GARCH: update variance conditionnelle (prédit σ_t pour NEXT bougie)
+        double var_t = initVar;
+        for (int i = 1; i < recentReturns.length; i++) {
+            double epsilon_t1 = recentReturns[i - 1] - meanReturn;  // Résidu lag-1
+            var_t = omega + alpha * (epsilon_t1 * epsilon_t1) + beta * var_t;
+        }
+        double sigma_t = Math.sqrt(var_t);  // Vol prédite (e.g., 0.005 = 0.5%)
+
+        // 7. Score 0-1 (comme AVANT: seuils forex pour composite/signaux)
+        if (sigma_t > 0.008) return 0.8;  // Haute vol prédite → ATTENDRE (risque spike)
+        if (sigma_t < 0.003) return 0.3;  // Basse → ACHAT/VENTE confiant
+        return 0.5;  // Neutre
     }
 
     // (getNeutralIndicators, generateSignal, calculateConfidence, generateReason, getPairConsensusAll, getPairConsensus, exportToCsv inchangées - copiez de précédent)
