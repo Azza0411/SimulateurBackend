@@ -23,6 +23,7 @@ import org.springframework.web.client.RestTemplate;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -84,6 +85,7 @@ public class SimulationServiceImpl implements SimulationService {
         return simulationRepository.save(simulation);
     }
 
+
     @Override
     public Simulation getSimulationById(Integer id) {
         Optional<Simulation> optional = simulationRepository.findById(id);
@@ -91,8 +93,23 @@ public class SimulationServiceImpl implements SimulationService {
             throw new RuntimeException("Simulation non trouvée avec ID : " + id);
         }
         Simulation sim = optional.get();
-        sim.setIaAdversaireActive(Optional.ofNullable(sim.getIaAdversaireActive()).orElse(false));  // FIX : Set safe après fetch
-        return sim;    }
+
+        // CORRECTION SANS APPEL À getUpdatedTempsRestant() → ÉVITE LA BOUCLE
+        if (sim.getStatutSimulation() == StatutSimulation.EXECUTEE && sim.getDateFin() != null) {
+            LocalDateTime now = LocalDateTime.now();
+            if (now.isAfter(sim.getDateFin())) {
+                sim.setStatutSimulation(StatutSimulation.TERMINEE);
+                sim.setTempsRestantSecondes(0);
+                simulationRepository.save(sim);
+            } else {
+                long restant = Duration.between(now, sim.getDateFin()).getSeconds();
+                sim.setTempsRestantSecondes((int) Math.max(0, restant));
+            }
+        }
+
+        sim.setIaAdversaireActive(Optional.ofNullable(sim.getIaAdversaireActive()).orElse(false));
+        return sim;
+    }
 
     @Override
     public List<Simulation> getAllSimulations() {
@@ -146,12 +163,15 @@ public class SimulationServiceImpl implements SimulationService {
         logger.info("Tentative de suppression de l'ID : {}", id);
         simulationRepository.deleteById(id);
     }
-
-    @Override
+ @Override
     public Simulation startSimulation(Integer id) {
         Simulation simulation = simulationRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Simulation non trouvée avec ID : " + id));
+        // AJOUT : Log + normalise (pour debug/mismatch)
+        String statutStr = simulation.getStatutSimulation() != null ? simulation.getStatutSimulation().name() : "NULL";
+        logger.info("START DEBUG - ID: {}, Statut: '{}'", id, statutStr);
         if (simulation.getStatutSimulation() != StatutSimulation.EN_ATTENTE) {
+            logger.warn("START REJETÉ - ID: {}, Statut: {} (doit être EN_ATTENTE)", id, statutStr);
             throw new RuntimeException("La simulation doit être en attente pour démarrer");
         }
         // === AJOUT : CALCUL DE LA FIN DU MATCH ===
@@ -170,19 +190,22 @@ public class SimulationServiceImpl implements SimulationService {
             tradingAgentService.activateIaAdversaire(id);
             logger.info("🤖 IA Adversaire activée pour simu MONO #{}", id);
         }
+        logger.info("START OK - ID: {}, Tout lancé (temps: {}, IA: {})", id, simulation.getTempsRestantSecondes(), simulation.getIaAdversaireActive());
         return simulationRepository.save(simulation);
     }
 
+
     @Override
     public Simulation endSimulation(Integer id) {
-        Simulation simulation = simulationRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Simulation non trouvée avec ID : " + id));
-        if (simulation.getStatutSimulation() != StatutSimulation.EXECUTEE) {
+        Simulation sim = getSimulationById(id); // Utilise la version corrigée
+
+        if (sim.getStatutSimulation() != StatutSimulation.EXECUTEE) {
             throw new RuntimeException("La simulation doit être en cours pour être terminée");
         }
-        simulation.setStatutSimulation(StatutSimulation.ANNULEE);
-        simulation.setDateFin(LocalDateTime.now());
-        return simulationRepository.save(simulation);
+
+        sim.setStatutSimulation(StatutSimulation.TERMINEE);
+        sim.setDateFin(LocalDateTime.now());
+        return simulationRepository.save(sim);
     }
 
     @Override
@@ -199,19 +222,14 @@ public class SimulationServiceImpl implements SimulationService {
     @Override
     public Map<String, Object> playIaMove(Integer simulationId, Map<String, Object> humanTrade) {
         Simulation sim = simulationRepository.findById(simulationId).orElseThrow();
-        // === AJOUT : VÉRIFIE SI LE TEMPS EST ÉCOULÉ ===
-        if (sim.getDateFin() != null && LocalDateTime.now().isAfter(sim.getDateFin())) {
-            sim.setStatutSimulation(StatutSimulation.TERMINEE);
-            sim.setTempsRestantSecondes(0);
-            simulationRepository.save(sim);
+        // === AJOUT : VÉRIFIE TEMPS VIA NOUVELLE MÉTHODE (auto-fin) ===
+        Map<String, Object> tempsInfo = getUpdatedTempsRestant(simulationId);
+        if ((Boolean) tempsInfo.get("fini")) {
             throw new RuntimeException("TEMPS ÉCOULÉ ! Le match est terminé.");
         }
-
-        // Mise à jour du temps restant (pour le front)
-        if (sim.getDateFin() != null) {
-            long restant = java.time.Duration.between(LocalDateTime.now(), sim.getDateFin()).getSeconds();
-            sim.setTempsRestantSecondes((int) Math.max(0, restant));
-        }
+// Mise à jour du temps restant (déjà gérée dans getUpdated)
+        int tempsActuel = (Integer) tempsInfo.get("tempsRestant");
+        sim.setTempsRestantSecondes(tempsActuel); // Sync DB si besoin (redondant mais safe)
         // === FIN AJOUT ===
         if (Boolean.FALSE.equals(Optional.ofNullable(sim.getIaAdversaireActive()).orElse(false)) || sim.getModeSimulation() != ModeSimulation.MONOJOUEUR) {  // FIX : Null-safe Boolean.FALSE.equals + orElse(false)
             throw new RuntimeException("IA adversaire non active (mode MONOJOUEUR seulement)");
@@ -315,6 +333,96 @@ public class SimulationServiceImpl implements SimulationService {
             simulation.setAnalyseResultats("{}");
             simulationRepository.save(simulation);
         }
+    }
+
+    @Override
+    public Map<String, Object> getUpdatedTempsRestant(Integer simulationId) {
+        // CHARGE DIRECTEMENT SANS PASSER PAR getSimulationById
+        Simulation sim = simulationRepository.findById(simulationId)
+                .orElseThrow(() -> new RuntimeException("Simulation non trouvée"));
+
+        LocalDateTime now = LocalDateTime.now();
+        if (sim.getDateFin() == null) {
+            return Map.of("tempsRestant", 0, "fini", true, "dureeMinutes", sim.getDureeJeuMinutes());
+        }
+
+        long restantMillis = Duration.between(now, sim.getDateFin()).toMillis();
+        int tempsRestant = (int) Math.max(0, restantMillis / 1000);
+        boolean fini = tempsRestant == 0;
+
+        if (fini && sim.getStatutSimulation() == StatutSimulation.EXECUTEE) {
+            sim.setStatutSimulation(StatutSimulation.TERMINEE);
+            sim.setTempsRestantSecondes(0);
+            simulationRepository.save(sim);
+        } else if (!fini) {
+            sim.setTempsRestantSecondes(tempsRestant);
+            simulationRepository.save(sim);
+        }
+
+        return Map.of("tempsRestant", tempsRestant, "fini", fini, "dureeMinutes", sim.getDureeJeuMinutes());
+    }
+
+    @Override
+    public List<Simulation> getSimulationsByStatus(StatutSimulation statut) {
+        return simulationRepository.findByStatutSimulation(statut);    }
+
+    @Override
+    public Map<String, Object> getYahooLivePrices() {
+        Map<String, Object> result = new HashMap<>();
+        for (String pair : Config.PAIRS) {
+            try {
+                List<Map<String, Object>> data = getData(pair, "1h");
+                if (!data.isEmpty()) {
+                    Map<String, Object> last = data.get(data.size() - 1);
+                    double close = (Double) last.get("Close");
+                    double open = (Double) data.get(0).get("Open");
+                    double changePct = ((close - open) / open) * 100;
+                    result.put(pair, Map.of("price", close, "changePct", changePct));
+                } else {
+                    result.put(pair, Map.of("price", 1.08, "changePct", 0.0));
+                }
+            } catch (Exception e) {
+                result.put(pair, Map.of("price", 1.08, "changePct", 0.0));
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<Map<String, Object>> getYahooCandles(String pair) {
+        try {
+            String url = String.format(
+                    "https://query1.finance.yahoo.com/v8/finance/chart/%s?interval=5m&period=1d", pair
+            );
+            String jsonStr = restTemplate.getForObject(url, String.class);
+            if (jsonStr != null && !jsonStr.contains("error")) {
+                JsonNode root = mapper.readTree(jsonStr);
+                JsonNode resultNode = root.path("chart").path("result").get(0);
+                if (resultNode != null) {
+                    JsonNode opens = resultNode.path("indicators").path("quote").get(0).path("open");
+                    JsonNode highs = resultNode.path("indicators").path("quote").get(0).path("high");
+                    JsonNode lows = resultNode.path("indicators").path("quote").get(0).path("low");
+                    JsonNode closes = resultNode.path("indicators").path("quote").get(0).path("close");
+
+                    List<Map<String, Object>> data = new ArrayList<>();
+                    int start = Math.max(0, opens.size() - 5);
+                    for (int i = start; i < opens.size(); i++) {
+                        Map<String, Object> candle = new HashMap<>();
+                        candle.put("Open", opens.get(i).asDouble(0));
+                        candle.put("High", highs.get(i).asDouble(0));
+                        candle.put("Low", lows.get(i).asDouble(0));
+                        candle.put("Close", closes.get(i).asDouble(0));
+                        data.add(candle);
+                    }
+                    return data;
+                }
+            }
+        } catch (Exception e) {
+            logger.warn("Erreur chandeliers {}: fallback", pair);
+        }
+        List<Map<String, Object>> fallback = getFallbackData(pair, "5m");
+        return fallback.subList(0, Math.min(5, fallback.size()));
+
     }
 
     @Scheduled(fixedDelayString = "${app.forex.update-interval:300000}")
@@ -745,6 +853,20 @@ public class SimulationServiceImpl implements SimulationService {
             logger.info("💾 Export CSV: {}", filename);
         } catch (IOException e) {
             logger.error("Erreur export CSV: {}", e.getMessage());
+        }
+    }
+    @Scheduled(fixedRateString = "${app.simulation.auto-end-check:30000}")
+    public void autoEndExpiredSimulations() {
+        List<Simulation> activeSims = simulationRepository.findByStatutSimulation(StatutSimulation.EXECUTEE);
+        LocalDateTime now = LocalDateTime.now();
+
+        for (Simulation sim : activeSims) {
+            if (sim.getDateFin() != null && now.isAfter(sim.getDateFin())) {
+                sim.setStatutSimulation(StatutSimulation.TERMINEE);
+                sim.setTempsRestantSecondes(0);
+                simulationRepository.save(sim);
+                logger.info("Simulation #{} terminée automatiquement (temps écoulé)", sim.getId());
+            }
         }
     }
 }

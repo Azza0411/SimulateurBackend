@@ -74,6 +74,7 @@ private regleSimulation regleSimulation ;
     @ManyToMany(mappedBy = "simulationsParticipees")
     private Set<UserEntity> users = new HashSet<>();
     // 🔹 One-to-Many pour les transactions
+    @JsonIgnore
     @OneToMany(mappedBy = "simulation", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Transaction> transactions = new HashSet<>();
 

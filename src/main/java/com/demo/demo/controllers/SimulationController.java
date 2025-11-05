@@ -3,6 +3,7 @@ package com.demo.demo.controllers;
 import com.demo.demo.entities.Simulation;
 import com.demo.demo.entities.StatutSimulation;
 import com.demo.demo.services.SimulationService;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,8 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/simulations")
+
+@CrossOrigin(origins = "http://localhost:4200", allowedHeaders = "*",methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS},allowCredentials = "true")
 public class SimulationController {
     private static final Logger logger = LoggerFactory.getLogger(SimulationController.class);
     @Autowired
@@ -35,6 +38,7 @@ public class SimulationController {
     }
 
     // Récupérer toutes les simulations
+
     @GetMapping
     public ResponseEntity<List<Simulation>> getAllSimulations() {
         List<Simulation> simulations = simulationService.getAllSimulations();
@@ -65,25 +69,17 @@ public class SimulationController {
 
 
     }
-    // === AJOUT : COMPTE À REBOURS (FRONT) ===
+    // === AJOUT : COMPTE À REBOURS AUTO (poll front + auto-fin) ===
     @GetMapping("/{id}/temps")
     public ResponseEntity<Map<String, Object>> getTempsRestant(@PathVariable Integer id) {
         try {
-            Simulation sim = simulationService.getSimulationById(id);
-            int tempsRestant = sim.getTempsRestantSecondes() != null ? sim.getTempsRestantSecondes() : 0;
-            boolean fini = sim.getStatutSimulation() == StatutSimulation.TERMINEE;
-
-            return ResponseEntity.ok(Map.of(
-                    "tempsRestant", tempsRestant,
-                    "fini", fini,
-                    "dureeMinutes", sim.getDureeJeuMinutes()
-            ));
+            Map<String, Object> tempsInfo = simulationService.getUpdatedTempsRestant(id);
+            return ResponseEntity.ok(tempsInfo);
         } catch (RuntimeException e) {
-            return ResponseEntity.status(404).body(Map.of("error", e.getMessage()));
+            return ResponseEntity.status(404).body(Map.of("error", e.getMessage(), "tempsRestant", 0, "fini", true));
         }
     }
-// === FIN AJOUT ===
-
+    // === FIN AJOUT ===
     // Démarrer une simulation
     @PostMapping("/{id}/start")
     public ResponseEntity<Simulation> startSimulation(@PathVariable Integer id) {
@@ -128,5 +124,34 @@ public class SimulationController {
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
+
+    }
+    /*
+    @GetMapping("/status/{statut}")
+    public ResponseEntity<List<Simulation>> getSimulationsByStatus(@PathVariable String statut) {
+        try {
+            StatutSimulation statutEnum = StatutSimulation.valueOf(statut.toUpperCase());
+            List<Simulation> simulations = simulationService.getSimulationsByStatus(statutEnum);
+            return ResponseEntity.ok(simulations);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(null);
+        }
     }
 }
+*/
+    @GetMapping("/status/{statut}")
+    public ResponseEntity<List<Simulation>> getSimulationsByStatus(@PathVariable String statut) {
+        logger.info("🔍 Requête status: {}", statut);  // Log pour tracer
+        try {
+            StatutSimulation statutEnum = StatutSimulation.valueOf(statut.toUpperCase().trim());
+            List<Simulation> simulations = simulationService.getSimulationsByStatus(statutEnum);
+            logger.info("📊 {} simus pour {}", simulations.size(), statutEnum);
+            return ResponseEntity.ok(simulations);
+        } catch (IllegalArgumentException e) {
+            logger.warn("❌ Statut invalide: {}", statut);
+            return ResponseEntity.badRequest().body(List.of());
+        } catch (Exception e) {
+            logger.error("💥 Erreur: {}", e.getMessage());
+            return ResponseEntity.internalServerError().body(List.of());
+        }
+    }}

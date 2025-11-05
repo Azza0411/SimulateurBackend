@@ -2,28 +2,34 @@ package com.demo.demo.serviceimplement;
 
 import com.demo.demo.entities.Simulation;
 import com.demo.demo.repository.SimulationRepository;
+import com.demo.demo.services.SimulationService;
 import com.demo.demo.services.TradingAgentService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 @Service
 public class TradingAgentServiceImpl implements TradingAgentService {
+
 
     private static final Logger logger = LoggerFactory.getLogger(TradingAgentServiceImpl.class);
 
     @Autowired
     private SimulationRepository simulationRepository;
-
-    @Value("${gemini.api.key}")
+    @Autowired
+    @Lazy
+    private SimulationService simulationService;
+    @Value("AIzaSyA_Pb_hGxDD_60YIZ6mo4H8aorPKBVaVKc")
     private String geminiApiKey;
 
     @Autowired
@@ -47,13 +53,22 @@ public class TradingAgentServiceImpl implements TradingAgentService {
         Simulation sim = simulationRepository.findById(simulationId).orElseThrow();
         double capital = sim.getCapitalActuel();
 
-        String prompt = String.format(
+       /* String prompt = String.format(
                 "Tu es un trader IA expert. L'humain a fait : %s sur %s. Capital IA : %.2f. " +
                         "Donne un contre-trade intelligent. Réponds UNIQUEMENT avec ce JSON : " +
                         "{\"type\":\"VENTE\",\"quantite\":800,\"prix\":1.0841,\"stopLoss\":1.0600,\"takeProfit\":1.1380,\"raison\":\"RSI 72, MACD baissier\"}",
                 userTrade, asset, capital
         );
-
+*/
+        String prompt = String.format(
+                "Tu es un trader IA expert. L'humain a fait : %s sur %s. Capital IA : %.2f. " +
+                        "Donne un contre-trade intelligent et VARIÉ (change prix/qty/raison du dernier). " +
+                        "Raisons possibles : RSI overbought, MACD crossover, EMA breakout, GARCH vol spike, VWAP support. " +
+                        "Prix : ~1.08 ±0.01 random. Qty : 50-1000 random. SL/TP : prix ±0.02. " +
+                        "Réponds UNIQUEMENT JSON valide : {\"type\":\"ACHAT\" ou \"VENTE\", \"quantite\":num, \"prix\":num, \"stopLoss\":num, \"takeProfit\":num, \"raison\":\"1-2 indicateurs variés\"}. " +
+                        "Sois créatif, varie !",
+                userTrade, asset, capital
+        );
         Map<String, Object> requestBody = Map.of(
                 "contents", List.of(Map.of(
                         "role", "user",
@@ -93,7 +108,7 @@ public class TradingAgentServiceImpl implements TradingAgentService {
             return fallbackJson();
         }
     }
-
+/*
     private String fallbackJson() {
         return """
             {
@@ -106,7 +121,22 @@ public class TradingAgentServiceImpl implements TradingAgentService {
             }
             """;
     }
+*/
+private String fallbackJson() {
+    Random rand = new Random();
+    String[] raisons = {"RSI overbought, sell", "MACD crossover", "EMA breakout", "GARCH vol spike", "VWAP support"};
+    String raison = raisons[rand.nextInt(raisons.length)];
+    double prix = 1.084 + (rand.nextBoolean() ? 0.001 : -0.001);
+    double qty = 50 + rand.nextInt(950);
+    double sl = prix - 0.02;
+    double tp = prix + 0.02;
+    String type = rand.nextBoolean() ? "ACHAT" : "VENTE";
 
+    return String.format(
+            "{\"type\":\"%s\",\"quantite\":%.0f,\"prix\":%.4f,\"stopLoss\":%.4f,\"takeProfit\":%.4f,\"raison\":\"%s\"}",
+            type, qty, prix, sl, tp, raison
+    );
+}
     @Override
     public Float updateScoreIaVsUser(Integer simulationId, Float pnlHuman) {
         Simulation sim = simulationRepository.findById(simulationId).orElseThrow();
