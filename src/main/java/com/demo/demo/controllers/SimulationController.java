@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -44,7 +45,7 @@ public class SimulationController {
         List<Simulation> simulations = simulationService.getAllSimulations();
         return ResponseEntity.ok(simulations);
     }
-
+/*
     // Mettre à jour une simulation
     @PutMapping("/{id}")
     public ResponseEntity<Simulation> updateSimulation(@PathVariable Integer id, @RequestBody Simulation details) {
@@ -60,7 +61,26 @@ public class SimulationController {
                 return ResponseEntity.status(400).body(null); // Erreur de validation
             }        }
     }
-
+*/
+@PutMapping("/{id}")
+public ResponseEntity<Simulation> updateSimulation(@PathVariable Integer id, @RequestBody Simulation details) {
+    try {
+        Simulation updatedSimulation = simulationService.updateSimulation(id, details);
+        return ResponseEntity.ok(updatedSimulation);
+    } catch (RuntimeException e) {
+        logger.warn("UPDATE REJETÉ (400) - ID: {} | Erreur: {}", id, e.getMessage());
+        // === CORRECTION : 400 pour erreur logique, 404 seulement si non trouvée ===
+        if (e.getMessage().contains("non trouvée")) {
+            return ResponseEntity.status(404).body(null);
+        } else {
+            // Amélioration : Retourne un body d'erreur JSON pour Angular (au lieu de null)
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Bad Request");
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.status(400).body((Simulation) null); // Garde null pour Simulation, mais tu peux customiser un Error DTO
+        }
+    }
+}
     // Supprimer une simulation
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteSimulation(@PathVariable Integer id) {

@@ -4,6 +4,7 @@ import com.demo.demo.config.Config;
 import com.demo.demo.entities.ModeSimulation;
 import com.demo.demo.entities.Simulation;
 import com.demo.demo.entities.StatutSimulation;
+import com.demo.demo.entities.typeSimulation;
 import com.demo.demo.repository.SimulationRepository;
 import com.demo.demo.services.SimulationService;
 import com.demo.demo.services.TradingAgentService;
@@ -115,7 +116,7 @@ public class SimulationServiceImpl implements SimulationService {
     public List<Simulation> getAllSimulations() {
         return simulationRepository.findAll();
     }
-
+/*
     @Override
     public Simulation updateSimulation(Integer id, Simulation details) {
         Simulation simulation = simulationRepository.findById(id)
@@ -156,7 +157,63 @@ public class SimulationServiceImpl implements SimulationService {
         }
 
         return simulationRepository.save(simulation);
+    }*/
+@Override
+public Simulation updateSimulation(Integer id, Simulation details) {
+    Simulation simulation = simulationRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Simulation non trouvée avec ID : " + id));
+
+    // === AJOUT : INTERDIRE MODIF SI DÉJÀ DÉMARRÉE OU TERMINÉE + LOG ===
+    if (simulation.getStatutSimulation() == StatutSimulation.EXECUTEE || simulation.getStatutSimulation() == StatutSimulation.TERMINEE) {
+        String message = "Impossible de modifier une simulation déjà démarrée ou terminée (ID: " + id + ")";
+        logger.warn(message); // ← LOG EN WARN
+        throw new RuntimeException(message); // ← 400 + message clair
     }
+
+    if (details.getDescription() != null) simulation.setDescription(details.getDescription());
+    if (details.getDuration() != null) simulation.setDuration(details.getDuration());
+    if (details.getDifficulte() != null) simulation.setDifficulte(details.getDifficulte());
+    if (details.getCapital() != null && details.getCapital() > 0) simulation.setCapital(details.getCapital());
+    if (details.getVitesseExecution() != null) simulation.setVitesseExecution(details.getVitesseExecution());
+    if (details.getVolatiliteMarche() != null) simulation.setVolatiliteMarche(details.getVolatiliteMarche());
+    if (details.getVolumeEchange() != null) simulation.setVolumeEchange(details.getVolumeEchange());
+    if (details.getRegleSimulation() != null) simulation.setRegleSimulation(details.getRegleSimulation());
+    if (details.getModeSimulation() != null) simulation.setModeSimulation(details.getModeSimulation());
+    if (details.getRisqueMaxAcceptable() != null) simulation.setRisqueMaxAcceptable(details.getRisqueMaxAcceptable());
+    if (details.getCapitalParUser() != null) simulation.setCapitalParUser(details.getCapitalParUser());
+
+    // === AJOUT : MODIFIER LA DURÉE DU MATCH (UNIQUEMENT EN ATTENTE) ===
+    if (details.getDureeJeuMinutes() != null) {
+        Integer duree = details.getDureeJeuMinutes();
+        if (duree < 1 || duree > 30) {
+            throw new RuntimeException("La durée du jeu doit être entre 1 et 30 minutes");
+        }
+        simulation.setDureeJeuMinutes(duree);
+        logger.info("Durée du match mise à jour : {} min pour simulation #{}", duree, id);
+    }
+    // === FIN AJOUT ===
+
+    // === AJOUT : MODIFIER TYPESIMULATION (UNIQUEMENT EN ATTENTE) ===
+    if (details.getTypeSimulation() != null) {
+        typeSimulation newType = details.getTypeSimulation(); // Assume enum ou String valide
+        // Validation simple : Vérifie enum valide (adapte si String)
+        try {
+            typeSimulation validatedType = typeSimulation.valueOf(newType.name()); // Force validation enum
+            simulation.setTypeSimulation(validatedType);
+            logger.info("TypeSimulation mise à jour : {} pour simulation #{}", validatedType, id);
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("TypeSimulation invalide : " + newType +
+                    ". Valeurs autorisées : CRASH, ACHAT_Massif, EVENT, EVENT_HISTORIQUE, FOREX");
+        }
+    }
+    // === FIN AJOUT ===
+
+    if (details.getStatutSimulation() != null) {
+        simulation.setStatutSimulation(details.getStatutSimulation());
+    }
+
+    return simulationRepository.save(simulation);
+}
 
     @Override
     public void deleteSimulation(Integer id) {

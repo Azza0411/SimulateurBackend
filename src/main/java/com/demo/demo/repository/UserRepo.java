@@ -30,4 +30,3 @@ public interface UserRepo extends JpaRepository<UserEntity, Long> {
     @Query(value="select * from users where email like %:domain%",nativeQuery = true)
     List<UserEntity> findbydomaine(@Param("domain") String un);
 }
-

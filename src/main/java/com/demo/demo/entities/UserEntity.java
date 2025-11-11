@@ -40,7 +40,7 @@ public class UserEntity {
 
     private niveau niveau;
     @Enumerated(EnumType.STRING)
-private badge badge;
+    private badge badge;
     private float tsi;
 
     // A user has only one role
