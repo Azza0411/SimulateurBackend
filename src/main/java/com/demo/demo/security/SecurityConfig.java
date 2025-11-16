@@ -57,6 +57,12 @@ public class SecurityConfig {
                     .requestMatchers(HttpMethod.GET, "/api/simulations/status/**").permitAll()
                     .requestMatchers("/api/simulations/**").hasAnyAuthority("ADMIN", "TRADER")  // Revert : Sécurisé comme 2ème
                     .requestMatchers("/api/yahoo/**").permitAll()
+                    .requestMatchers("/api/yahoo/forex/**").permitAll()
+                    .requestMatchers( "/api/yahoo/forex/candles/**").permitAll()
+
+                    .requestMatchers("/api/alpha/**").permitAll() // NOUVEAU : /live-tech, /candles-tech/{symbol}
+                    .requestMatchers("/api/finhub/**").permitAll() // NOUVEAU : /live-energy, /candles-energy/{symbol}
+                    .requestMatchers("/api/twelvedata/**").permitAll() // NOUVEAU : /live-commodities, /candles-commodities/{symbol}
                     .requestMatchers("/testt/**").permitAll()
                     .requestMatchers("/api/simulations/**").permitAll() // ← LE FIX : Autorise tout (y compris PUT update)
 

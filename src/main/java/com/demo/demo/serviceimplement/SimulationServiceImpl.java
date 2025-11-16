@@ -422,8 +422,8 @@ public Simulation updateSimulation(Integer id, Simulation details) {
     @Override
     public List<Simulation> getSimulationsByStatus(StatutSimulation statut) {
         return simulationRepository.findByStatutSimulation(statut);    }
-
-    @Override
+/// //////////////////////deux api ensemble forex techniq____///////
+   /* @Override
     public Map<String, Object> getYahooLivePrices() {
         Map<String, Object> result = new HashMap<>();
         for (String pair : Config.PAIRS) {
@@ -443,7 +443,71 @@ public Simulation updateSimulation(Integer id, Simulation details) {
             }
         }
         return result;
+    }*/
+// === REMPLACE getYahooLivePrices() PAR ÇA (TOUT ENSEMBLE) ===
+@Override
+public Map<String, Object> getYahooLivePrices() {
+    Map<String, Object> result = new HashMap<>();
+
+    // === FOREX + TECH ENSEMBLE ===
+    List<String> allSymbols = new ArrayList<>(Config.PAIRS);
+    allSymbols.addAll(Config.TECH_SYMBOLS);
+
+    for (String symbol : allSymbols) {
+        try {
+            String url = "https://query1.finance.yahoo.com/v8/finance/chart/" + symbol +
+                    "?range=1d&interval=1m";
+
+            logger.info("Yahoo → {}", url);
+
+            String jsonStr = restTemplate.getForObject(url, String.class);
+            if (jsonStr == null || jsonStr.trim().isEmpty()) {
+                logger.warn("Réponse vide pour {}", symbol);
+                result.put(symbol, Map.of("price", 0.0, "changePct", 0.0));
+                continue;
+            }
+
+            JsonNode root = mapper.readTree(jsonStr);
+            JsonNode chart = root.path("chart");
+            if (chart.isMissingNode()) {
+                logger.warn("Pas de 'chart' dans la réponse pour {}", symbol);
+                result.put(symbol, Map.of("price", 0.0, "changePct", 0.0));
+                continue;
+            }
+
+            JsonNode resultNode = chart.path("result");
+            if (resultNode.isMissingNode() || resultNode.size() == 0) {
+                logger.warn("Pas de 'result' pour {}", symbol);
+                result.put(symbol, Map.of("price", 0.0, "changePct", 0.0));
+                continue;
+            }
+
+            JsonNode meta = resultNode.get(0).path("meta");
+            double price = meta.path("regularMarketPrice").asDouble(0.0);
+            double previousClose = meta.path("chartPreviousClose").asDouble(0.0);
+
+            if (price <= 0 || previousClose <= 0) {
+                logger.warn("Prix invalide pour {}: price={}, previousClose={}", symbol, price, previousClose);
+                result.put(symbol, Map.of("price", 0.0, "changePct", 0.0));
+                continue;
+            }
+
+            double changePct = ((price - previousClose) / previousClose) * 100;
+
+            result.put(symbol, Map.of(
+                    "price", round(price, symbol.contains("=X") ? 5 : 2),
+                    "changePct", round(changePct, 2)
+            ));
+
+            logger.info("{} → price: {}, change: {}%", symbol, price, changePct);
+
+        } catch (Exception e) {
+            logger.error("Exception Yahoo {}: {}", symbol, e.getMessage(), e);
+            result.put(symbol, Map.of("price", 0.0, "changePct", 0.0));
+        }
     }
+    return result;
+}
 
     @Override
     public List<Map<String, Object>> getYahooCandles(String pair) {
@@ -481,6 +545,8 @@ public Simulation updateSimulation(Integer id, Simulation details) {
         return fallback.subList(0, Math.min(5, fallback.size()));
 
     }
+
+
 
     @Scheduled(fixedDelayString = "${app.forex.update-interval:300000}")
     public void updateActiveSimulations() {
@@ -926,4 +992,367 @@ public Simulation updateSimulation(Integer id, Simulation details) {
             }
         }
     }
+    @Value("${app.alpha.key:PD3XA6I2Q0V90AYX}")  // Fallback 'demo' pour tests (remplace par vraie clé en prod)
+    private String alphaKey;
+/*
+    // NOUVEAU : Prix live pour TECH (comme getYahooLivePrices, mais Alpha)
+    @Override
+    public Map<String, Object> getAlphaLivePrices() {
+        Map<String, Object> result = new HashMap<>();
+        for (String symbol : Config.TECH_SYMBOLS) {  // AAPL, MSFT, GOOGL
+            try {
+                String url = String.format(
+                        "https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=%s&apikey=%s",
+                        symbol, alphaKey
+                );
+                String jsonStr = restTemplate.getForObject(url, String.class);
+                if (jsonStr != null && jsonStr.contains("\"01. symbol\"")) {  // Succès (pas d'erreur API)
+                    JsonNode root = mapper.readTree(jsonStr);
+                    JsonNode quote = root.path("Global Quote");
+                    if (quote != null && !quote.isMissingNode()) {
+                        double price = quote.path("05. price").asDouble(0);
+                        double open = quote.path("02. open").asDouble(0);
+                        double changePct = open > 0 ? ((price - open) / open) * 100 : 0.0;
+                        result.put(symbol, Map.of("price", price, "changePct", changePct));
+                    } else {
+                        result.put(symbol, Map.of("price", 150.0, "changePct", 0.0));  // Fallback AAPL-like
+                    }
+                } else {
+                    result.put(symbol, Map.of("price", 150.0, "changePct", 0.0));
+                }
+            } catch (Exception e) {
+                logger.warn("Erreur Alpha live pour {}: {}", symbol, e.getMessage());
+                result.put(symbol, Map.of("price", 150.0, "changePct", 0.0));
+            }
+        }
+        return result;
+    }
+*/
+@Override
+public Map<String, Object> getAlphaLivePrices() {
+    return getYahooLivePrices(); // ← 1 ligne, réutilise ta méthode existante
+
 }
+
+    // === UTILITÉ ===
+    private double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+        long factor = (long) Math.pow(10, places);
+        return (double) Math.round(value * factor) / factor;
+    }
+    // NOUVEAU : Candles pour TECH (comme getYahooCandles, 5 dernières 1min)
+    @Override
+    public List<Map<String, Object>> getAlphaCandles(String symbol) {
+        try {
+            String url = String.format(
+                    "https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=%s&interval=1min&outputsize=compact&apikey=%s",
+                    symbol, alphaKey
+            );
+            String jsonStr = restTemplate.getForObject(url, String.class);
+            if (jsonStr != null && jsonStr.contains("\"Time Series (1min)\"")) {
+                JsonNode root = mapper.readTree(jsonStr);
+                JsonNode timeSeries = root.path("Time Series (1min)");
+                if (timeSeries != null && timeSeries.isObject()) {
+                    List<Map<String, Object>> data = new ArrayList<>();
+                    // Récupère les 5 plus récentes (timeSeries est un objet {timestamp: {ohlc...}})
+                    Iterator<Map.Entry<String, JsonNode>> it = timeSeries.fields();
+                    List<JsonNode> recent = new ArrayList<>();
+                    while (it.hasNext() && recent.size() < 5) {
+                        recent.add(it.next().getValue());
+                    }
+                    Collections.reverse(recent);  // Trier récentes d'abord
+                    for (JsonNode candle : recent) {
+                        Map<String, Object> row = new HashMap<>();
+                        row.put("Open", candle.path("1. open").asDouble(0));
+                        row.put("High", candle.path("2. high").asDouble(0));
+                        row.put("Low", candle.path("3. low").asDouble(0));
+                        row.put("Close", candle.path("4. close").asDouble(0));
+                        data.add(row);
+                    }
+                    return data;
+                }
+            }
+        } catch (Exception e) {
+            logger.warn("Erreur Alpha candles pour {}: fallback", symbol);
+        }
+        // Fallback : Mock data
+        return getFallbackTechCandles(symbol);
+    }
+
+
+    // Helper privé pour fallback (ajoute-le)
+    private List<Map<String, Object>> getFallbackTechCandles(String symbol) {
+        double basePrice = symbol.equals("AAPL") ? 150.0 : (symbol.equals("MSFT") ? 300.0 : 120.0);
+        List<Map<String, Object>> data = new ArrayList<>();
+        Random rand = new Random();
+        for (int i = 0; i < 5; i++) {
+            double variation = (rand.nextDouble() - 0.5) * 0.02;  // ±1%
+            double price = basePrice * (1 + variation);
+            Map<String, Object> candle = new HashMap<>();
+            candle.put("Open", price * 0.999);
+            candle.put("High", price * 1.002);
+            candle.put("Low", price * 0.998);
+            candle.put("Close", price);
+            data.add(candle);
+        }
+        return data;
+    }
+//energy
+
+    // ... imports existants + import com.fasterxml.jackson.databind.JsonNode; import org.slf4j.Logger; etc.
+
+    @Value("${app.finhub.key:d3oemkpr01quo6o40rogd3oemkpr01quo6o40rp0}")
+    private String finhubKey;
+
+    @Override
+    public Map<String, Object> getFinnhubLivePrices() {
+        Map<String, Object> result = new HashMap<>();
+        for (String symbol : Config.ENERGY_SYMBOLS) {  // XOM, CVX, etc.
+            try {
+                String url = String.format("https://finnhub.io/api/v1/quote?symbol=%s&token=%s", symbol, finhubKey);
+                String jsonStr = restTemplate.getForObject(url, String.class);
+                if (jsonStr != null && !jsonStr.contains("error")) {
+                    JsonNode root = mapper.readTree(jsonStr);
+                    double price = root.path("c").asDouble(0);  // Current price
+                    double open = root.path("o").asDouble(0);   // Open today
+                    double changePct = open > 0 ? root.path("pc").asDouble(0) : 0.0;  // % change (pré-calculé par Finnhub)
+                    result.put(symbol, Map.of("price", price, "changePct", changePct));
+                } else {
+                    result.put(symbol, Map.of("price", 80.0, "changePct", 0.0));  // Fallback énergie (~XOM)
+                }
+            } catch (Exception e) {
+                logger.warn("Erreur Finnhub live pour {}: {}", symbol, e.getMessage());
+                result.put(symbol, Map.of("price", 80.0, "changePct", 0.0));
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<Map<String, Object>> getFinnhubCandles(String symbol) {
+        try {
+            long to = System.currentTimeMillis() / 1000;  // Unix now
+            long from = to - 300 * 60;  // 5 min ago (300s = 5min, resolution 1min)
+            String url = String.format(
+                    "https://finnhub.io/api/v1/stock/candle?symbol=%s&resolution=1&from=%d&to=%d&token=%s",
+                    symbol, from, to, finhubKey
+            );
+            String jsonStr = restTemplate.getForObject(url, String.class);
+            if (jsonStr != null && !jsonStr.contains("error")) {
+                JsonNode root = mapper.readTree(jsonStr);
+                int s = root.path("s").asInt();  // Status (0=OK)
+                if (s == 0) {
+                    List<Map<String, Object>> data = new ArrayList<>();
+                    int count = root.path("t").size();  // Timestamps size
+                    int start = Math.max(0, count - 5);  // 5 dernières
+                    for (int i = start; i < count; i++) {
+                        Map<String, Object> candle = new HashMap<>();
+                        candle.put("Open", root.path("o").get(i).asDouble(0));
+                        candle.put("High", root.path("h").get(i).asDouble(0));
+                        candle.put("Low", root.path("l").get(i).asDouble(0));
+                        candle.put("Close", root.path("c").get(i).asDouble(0));
+                        data.add(candle);
+                    }
+                    return data;
+                }
+            }
+        } catch (Exception e) {
+            logger.warn("Erreur Finnhub candles pour {}: fallback", symbol);
+        }
+        return getFallbackEnergyCandles(symbol);
+    }
+
+    private List<Map<String, Object>> getFallbackEnergyCandles(String symbol) {
+        double basePrice = symbol.equals("XOM") ? 80.0 : (symbol.equals("CVX") ? 120.0 : 100.0);
+        List<Map<String, Object>> data = new ArrayList<>();
+        Random rand = new Random();
+        for (int i = 0; i < 5; i++) {
+            double variation = (rand.nextDouble() - 0.5) * 0.015;  // ±0.75% (vol énergie)
+            double price = basePrice * (1 + variation);
+            Map<String, Object> candle = new HashMap<>();
+            candle.put("Open", price * 0.999);
+            candle.put("High", price * 1.0015);
+            candle.put("Low", price * 0.9985);
+            candle.put("Close", price);
+            data.add(candle);
+        }
+        return data;
+    }
+
+// ... imports + import com.fasterxml.jackson.databind.JsonNode;
+// === COMMODITIES VIA YAHOO (ILLIMITÉ) ===
+// === COMMODITIES LIVE PRICES – CORRIGÉ ===
+@Override
+public Map<String, Object> getTwelveDataLivePrices() {
+    Map<String, Object> result = new HashMap<>();
+
+    Map<String, String> yahooMap = Map.of(
+            "CL", "CL=F",   // Crude Oil
+            "GC", "GC=F",   // Gold
+            "SI", "SI=F",   // Silver
+            "HG", "HG=F",   // Copper
+            "NG", "NG=F",   // Natural Gas
+            "ZB", "ZB=F"    // 30-Year Treasury Bond
+    );
+
+    for (String symbol : Config.COMMODITY_SYMBOLS) { // ← CORRIGÉ : COMMODITY_SYMBOLS
+        String yahooSymbol = yahooMap.getOrDefault(symbol, symbol);
+        try {
+            String url = "https://query1.finance.yahoo.com/v8/finance/chart/" + yahooSymbol +
+                    "?range=1d&interval=1m";
+
+            logger.info("Yahoo Commodities → {}", url);
+
+            String jsonStr = restTemplate.getForObject(url, String.class);
+            if (jsonStr == null || jsonStr.trim().isEmpty()) {
+                logger.warn("Réponse vide pour {}", symbol);
+                result.put(symbol, Map.of("price", 0.0, "changePct", 0.0));
+                continue;
+            }
+
+            JsonNode root = mapper.readTree(jsonStr);
+            JsonNode resultNode = root.path("chart").path("result");
+            if (resultNode.isMissingNode() || resultNode.size() == 0) {
+                logger.warn("Pas de 'result' pour {}", symbol);
+                result.put(symbol, Map.of("price", 0.0, "changePct", 0.0));
+                continue;
+            }
+
+            JsonNode meta = resultNode.get(0).path("meta");
+            double price = meta.path("regularMarketPrice").asDouble(0.0);
+            double previousClose = meta.path("chartPreviousClose").asDouble(0.0);
+
+            if (price <= 0 || previousClose <= 0) {
+                logger.warn("Prix invalide pour {}: price={}, previousClose={}", symbol, price, previousClose);
+                result.put(symbol, Map.of("price", 0.0, "changePct", 0.0));
+                continue;
+            }
+
+            double changePct = ((price - previousClose) / previousClose) * 100;
+
+            result.put(symbol, Map.of(
+                    "price", round(price, symbol.equals("GC") ? 1 : 2),
+                    "changePct", round(changePct, 2)
+            ));
+
+            logger.info("{} → price: {}, change: {}%", symbol, price, changePct);
+
+        } catch (Exception e) {
+            logger.error("Exception Yahoo Commodities {}: {}", symbol, e.getMessage(), e);
+            result.put(symbol, Map.of("price", 0.0, "changePct", 0.0));
+        }
+    }
+    return result;
+}
+    @Override
+    public List<Map<String, Object>> getTwelveDataCandles(String symbol) {
+        String yahooSymbol = Map.of(
+                "CL", "CL=F", "GC", "GC=F", "SI", "SI=F",
+                "HG", "HG=F", "NG", "NG=F", "ZB", "ZB=F"
+        ).getOrDefault(symbol, symbol);
+
+        return getYahooCandles(yahooSymbol);
+    }
+
+    private List<Map<String, Object>> getFallbackCommodityCandles(String symbol) {
+        double basePrice = symbol.equals("CL") ? 75.0 : (symbol.equals("GC") ? 2000.0 : 25.0);  // Pétrole/or/argent
+        List<Map<String, Object>> data = new ArrayList<>();
+        Random rand = new Random();
+        for (int i = 0; i < 5; i++) {
+            double variation = (rand.nextDouble() - 0.5) * 0.02;  // ±1% vol commodities
+            double price = basePrice * (1 + variation);
+            Map<String, Object> candle = new HashMap<>();
+            candle.put("Open", price * 0.999);
+            candle.put("High", price * 1.002);
+            candle.put("Low", price * 0.998);
+            candle.put("Close", price);
+            data.add(candle);
+        }
+        return data;
+    }
+// ... imports existants + import com.fasterxml.jackson.databind.JsonNode;
+
+    // === REMPLACE getAlphaRealEstateLivePrices() PAR ÇA ===
+    @Override
+    public Map<String, Object> getAlphaRealEstateLivePrices() {
+        Map<String, Object> result = new HashMap<>();
+        for (String symbol : Config.REAL_ESTATE_SYMBOLS) {
+            try {
+                String url = "https://query1.finance.yahoo.com/v8/finance/chart/" + symbol +
+                        "?range=1d&interval=1m";
+
+                String jsonStr = restTemplate.getForObject(url, String.class);
+                if (jsonStr == null || jsonStr.trim().isEmpty()) {
+                    result.put(symbol, Map.of("price", 0.0, "changePct", 0.0));
+                    continue;
+                }
+
+                JsonNode root = mapper.readTree(jsonStr);
+                JsonNode resultNode = root.path("chart").path("result");
+                if (resultNode.isMissingNode() || resultNode.size() == 0) {
+                    result.put(symbol, Map.of("price", 0.0, "changePct", 0.0));
+                    continue;
+                }
+
+                JsonNode meta = resultNode.get(0).path("meta");
+                double price = meta.path("regularMarketPrice").asDouble(0.0);
+                double previousClose = meta.path("chartPreviousClose").asDouble(0.0);
+
+                if (price <= 0 || previousClose <= 0) {
+                    result.put(symbol, Map.of("price", 0.0, "changePct", 0.0));
+                    continue;
+                }
+
+                double changePct = ((price - previousClose) / previousClose) * 100;
+
+                result.put(symbol, Map.of(
+                        "price", round(price, 2),
+                        "changePct", round(changePct, 2)
+                ));
+
+            } catch (Exception e) {
+                logger.warn("Yahoo Real Estate {} échoué: {}", symbol, e.getMessage());
+                result.put(symbol, Map.of("price", 0.0, "changePct", 0.0));
+            }
+        }
+        return result;
+    }
+    @Override
+    public List<Map<String, Object>> getAlphaRealEstateCandles(String symbol) {
+        try {
+            String url = String.format(
+                    "https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=%s&interval=1min&outputsize=compact&apikey=%s",
+                    symbol, alphaKey
+            );
+            String jsonStr = restTemplate.getForObject(url, String.class);
+            if (jsonStr != null && jsonStr.contains("\"Time Series (1min)\"")) {
+                JsonNode root = mapper.readTree(jsonStr);
+                JsonNode timeSeries = root.path("Time Series (1min)");
+                if (timeSeries != null && timeSeries.isObject()) {
+                    List<Map<String, Object>> data = new ArrayList<>();
+                    Iterator<Map.Entry<String, JsonNode>> it = timeSeries.fields();
+                    List<JsonNode> recent = new ArrayList<>();
+                    while (it.hasNext() && recent.size() < 5) {
+                        recent.add(it.next().getValue());
+                    }
+                    Collections.reverse(recent);  // Récentes d'abord
+                    for (JsonNode candle : recent) {
+                        Map<String, Object> row = new HashMap<>();
+                        row.put("Open", candle.path("1. open").asDouble(0));
+                        row.put("High", candle.path("2. high").asDouble(0));
+                        row.put("Low", candle.path("3. low").asDouble(0));
+                        row.put("Close", candle.path("4. close").asDouble(0));
+                        data.add(row);
+                    }
+                    return data;
+                }
+            }
+        } catch (Exception e) {
+            logger.warn("Erreur Alpha real-estate candles pour {}: fallback", symbol);
+        }
+        return getFallbackRealEstateCandles(symbol);
+    }
+
+    private List<Map<String, Object>> getFallbackRealEstateCandles(String symbol) {
+        return getYahooCandles(symbol); // ← RÉUTILISE TA MÉTHODE EXISTANTE
+         }}

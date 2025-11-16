@@ -26,4 +26,20 @@ SimulationService {
     List<Simulation> getSimulationsByStatus(StatutSimulation statut);
     Map<String, Object> getYahooLivePrices();           // Nouveau
     List<Map<String, Object>> getYahooCandles(String pair); // Nouveau
+    // NOUVEAU : Pour secteur TECHNOLOGIE (Alpha Vantage)
+    Map<String, Object> getAlphaLivePrices();  // Prix live + % change pour AAPL/MSFT/GOOGL
+    List<Map<String, Object>> getAlphaCandles(String symbol);  // 5 dernières candles 1min pour un symbol
+    // NOUVEAU : Pour secteur ÉNERGIE (Finnhub)
+    Map<String, Object> getFinnhubLivePrices();  // Prix live + % change pour XOM/CVX/etc.
+    List<Map<String, Object>> getFinnhubCandles(String symbol);  // 5 dernières candles 1min
+    //matier premiere
+    // NOUVEAU : Pour matières premières (Twelve Data)
+    Map<String, Object> getTwelveDataLivePrices();  // Prix live + % change pour CL/GC/etc.
+    List<Map<String, Object>> getTwelveDataCandles(String symbol);  // 5 dernières candles 1min
+    //immobillier
+    // NOUVEAU : Pour immobilier (Alpha Vantage, réutilise clé)
+    Map<String, Object> getAlphaRealEstateLivePrices();  // Prix live + % change pour PLD/AMT/etc.
+    List<Map<String, Object>> getAlphaRealEstateCandles(String symbol);  // 5 dernières candles 1min
+
+
 }
