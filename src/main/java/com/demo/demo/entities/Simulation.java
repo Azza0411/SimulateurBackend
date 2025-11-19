@@ -19,13 +19,17 @@ public class Simulation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 
     private int id;
-    @Enumerated(EnumType.STRING)
-private typeSimulation typeSimulation;
+    /*@Enumerated(EnumType.STRING)
+private typeSimulation typeSimulation;*/
     private Date datePrediction;
     private String description;
-    private Duration duration;
+    //private Duration duration;
     @Enumerated(EnumType.STRING)
     private difficulte difficulte;
+    // NOUVEAU ENUM REMPLAÇANT typeSimulation
+    @Enumerated(EnumType.STRING)
+    @Column(name = "market_type", nullable = false)
+    private MarketType marketType;
 private Float capital;
     // === AJOUT : TEMPS DU MATCH JOUEUR vs IA (MONOJOUEUR) ===
     @Column(name = "duree_jeu_minutes")
@@ -38,8 +42,13 @@ private regleSimulation regleSimulation ;
     @Enumerated(EnumType.STRING)
     @Column(name = "mode_simulation")
     @JsonProperty("ModeSimulation")  // ← Accepte "ModeSimulation" dans le JSON
-    private ModeSimulation modeSimulation;
+    private ModeSimulation modeSimulation= ModeSimulation.MONOJOUEUR;;
+    // === MULTI-ASSETS : LES NOUVEAUX CHAMPS ESSENTIELS ===
+    @Column(name = "allowed_assets", length = 1000)
+    private String allowedAssets = "ALL"; // "ALL" ou "NVDA,TSLA,AAPL,CL=F"
 
+    @Column(name = "current_asset")
+    private String currentAsset; // Actif actuellement tradé (ex: "NVDA")
 
     @Column(name = "temps_restant_secondes")
     private Integer tempsRestantSecondes; // Mis à jour à chaque tour
@@ -55,6 +64,12 @@ private regleSimulation regleSimulation ;
     @Enumerated(EnumType.STRING)
 
     private StatutSimulation statutSimulation;
+    // === GARCH LIVE UNIQUEMENT POUR LE JOUEUR (l'IA ne voit PAS ça) ===
+    @Column(name = "garch_live_prediction", columnDefinition = "TEXT")
+    private String garchLivePrediction = "{}";  // JSON mis à jour toutes les 30s
+
+    @Transient  // Pas en DB, juste pour savoir quand rafraîchir
+    private LocalDateTime garchLastUpdate;
     //@Transient
     //private String forexSignalsJson;  // JSON signals pour sim
     // Nouveaux attributs pour IA en temps réel
@@ -91,13 +106,7 @@ private regleSimulation regleSimulation ;
         this.id = id;
     }
 
-    public com.demo.demo.entities.typeSimulation getTypeSimulation() {
-        return typeSimulation;
-    }
 
-    public void setTypeSimulation(com.demo.demo.entities.typeSimulation typeSimulation) {
-        this.typeSimulation = typeSimulation;
-    }
 
     public String getDescription() {
         return description;
@@ -107,9 +116,6 @@ private regleSimulation regleSimulation ;
         this.description = description;
     }
 
-    public Duration getDuration() {
-        return duration;
-    }
 
     public LocalDateTime getDateDebut() {
         return dateDebut;
@@ -139,6 +145,30 @@ private regleSimulation regleSimulation ;
         return dernierTradeIa;
     }
 
+    public MarketType getMarketType() {
+        return marketType;
+    }
+
+    public void setMarketType(MarketType marketType) {
+        this.marketType = marketType;
+    }
+
+    public String getAllowedAssets() {
+        return allowedAssets;
+    }
+
+    public void setAllowedAssets(String allowedAssets) {
+        this.allowedAssets = allowedAssets;
+    }
+
+    public String getCurrentAsset() {
+        return currentAsset;
+    }
+
+    public void setCurrentAsset(String currentAsset) {
+        this.currentAsset = currentAsset;
+    }
+
     public void setDernierTradeIa(String dernierTradeIa) {
         this.dernierTradeIa = dernierTradeIa;
     }
@@ -165,6 +195,22 @@ private regleSimulation regleSimulation ;
 
     public void setGainTotal(Float gainTotal) {
         this.gainTotal = gainTotal;
+    }
+
+    public String getGarchLivePrediction() {
+        return garchLivePrediction;
+    }
+
+    public void setGarchLivePrediction(String garchLivePrediction) {
+        this.garchLivePrediction = garchLivePrediction;
+    }
+
+    public LocalDateTime getGarchLastUpdate() {
+        return garchLastUpdate;
+    }
+
+    public void setGarchLastUpdate(LocalDateTime garchLastUpdate) {
+        this.garchLastUpdate = garchLastUpdate;
     }
 
     public Float getRisqueMaxAcceptable() {
@@ -249,9 +295,6 @@ private regleSimulation regleSimulation ;
         this.carnetsOrdre = carnetsOrdre;
     }
 
-    public void setDuration(Duration duration) {
-        this.duration = duration;
-    }
 
     public com.demo.demo.entities.difficulte getDifficulte() {
         return difficulte;

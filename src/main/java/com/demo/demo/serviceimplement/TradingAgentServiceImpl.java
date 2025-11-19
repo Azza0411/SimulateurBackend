@@ -137,7 +137,7 @@ private String fallbackJson() {
             type, qty, prix, sl, tp, raison
     );
 }
-    @Override
+   /* @Override
     public Float updateScoreIaVsUser(Integer simulationId, Float pnlHuman) {
         Simulation sim = simulationRepository.findById(simulationId).orElseThrow();
         float pnlIa = (float) (Math.random() * 200 - 100);
@@ -146,4 +146,44 @@ private String fallbackJson() {
         simulationRepository.save(sim);
         return sim.getScoreIaVsUser();
     }
-}
+}*/
+   @Override
+   public Float updateScoreIaVsUser(Integer simulationId, Float pnlHuman) {
+       Simulation sim = simulationRepository.findById(simulationId).orElseThrow();
+
+       try {
+           Map<String, Object> livePrices = simulationService.getYahooLivePrices();
+
+           String dernierIaJson = sim.getDernierTradeIa();
+           if (dernierIaJson == null || dernierIaJson.trim().isEmpty() || dernierIaJson.equals("{}")) {
+               return sim.getScoreIaVsUser();
+           }
+
+           ObjectMapper mapper = new ObjectMapper();
+           Map<String, Object> iaTrade = mapper.readValue(dernierIaJson, Map.class);
+
+           String typeIa = (String) iaTrade.get("type");
+           Double prixIa = ((Number) iaTrade.get("prix")).doubleValue();
+           Double quantiteIa = ((Number) iaTrade.get("quantite")).doubleValue();
+           String asset = (String) iaTrade.get("asset");
+           if (asset == null) asset = sim.getCurrentAsset();
+
+           Map<String, Object> assetData = (Map<String, Object>) livePrices.getOrDefault(asset, Map.of("price", 0.0));
+           double prixActuel = ((Number) assetData.get("price")).doubleValue();
+
+           double pnlIa = "ACHAT".equalsIgnoreCase(typeIa)
+                   ? (prixActuel - prixIa) * quantiteIa
+                   : (prixIa - prixActuel) * quantiteIa;
+
+           // Score total cumulé (positif = IA gagne)
+           float nouveauScore = sim.getScoreIaVsUser() + (float) (pnlIa - pnlHuman);
+           sim.setScoreIaVsUser(nouveauScore);
+           simulationRepository.save(sim);
+
+           return nouveauScore;
+
+       } catch (Exception e) {
+           logger.error("Erreur calcul score", e);
+           return sim.getScoreIaVsUser();
+       }
+   }}

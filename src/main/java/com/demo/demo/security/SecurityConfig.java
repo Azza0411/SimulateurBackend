@@ -55,7 +55,7 @@ public class SecurityConfig {
                     .requestMatchers(HttpMethod.POST, "/api/simulations").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/simulations").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/simulations/status/**").permitAll()
-                    .requestMatchers("/api/simulations/**").hasAnyAuthority("ADMIN", "TRADER")  // Revert : Sécurisé comme 2ème
+                   // .requestMatchers("/api/simulations/**").hasAnyAuthority("ADMIN", "TRADER")  // Revert : Sécurisé comme 2ème
                     .requestMatchers("/api/yahoo/**").permitAll()
                     .requestMatchers("/api/yahoo/forex/**").permitAll()
                     .requestMatchers( "/api/yahoo/forex/candles/**").permitAll()
@@ -65,7 +65,14 @@ public class SecurityConfig {
                     .requestMatchers("/api/twelvedata/**").permitAll() // NOUVEAU : /live-commodities, /candles-commodities/{symbol}
                     .requestMatchers("/testt/**").permitAll()
                     .requestMatchers("/api/simulations/**").permitAll() // ← LE FIX : Autorise tout (y compris PUT update)
+// ==================== SIMULATIONS : TOUT AUTORISÉ (c’est ÇA qui débloque le start) ====================
+                            .requestMatchers(HttpMethod.GET, "/api/simulations/**").permitAll()
+                            .requestMatchers(HttpMethod.POST, "/api/simulations/**").permitAll()   // ← crée + start + ia-move
+                            .requestMatchers(HttpMethod.PUT, "/api/simulations/**").permitAll()    // ← update
+                            .requestMatchers(HttpMethod.DELETE, "/api/simulations/**").permitAll()
 
+// OPTIONS CORS (indispensable pour le preflight du front)
+                            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                     .requestMatchers(HttpMethod.GET,"/api/yahoo/**").permitAll()
                     // Intégration du 2ème : Tests publics
                     .requestMatchers("/test/questions", "/test/submit").permitAll()

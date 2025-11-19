@@ -4,12 +4,17 @@ import com.demo.demo.entities.Simulation;
 import com.demo.demo.entities.StatutSimulation;
 import com.demo.demo.services.SimulationService;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +27,8 @@ public class SimulationController {
     private static final Logger logger = LoggerFactory.getLogger(SimulationController.class);
     @Autowired
     private SimulationService simulationService;
+    // Mapper partagé (comme dans le service)
+    private final ObjectMapper mapper = new ObjectMapper();
     @PostMapping
     public ResponseEntity<Simulation> createSimulation(@RequestBody Simulation simulation) {
         return ResponseEntity.ok(simulationService.createSimulation(simulation));
@@ -45,24 +52,8 @@ public class SimulationController {
         List<Simulation> simulations = simulationService.getAllSimulations();
         return ResponseEntity.ok(simulations);
     }
-/*
-    // Mettre à jour une simulation
-    @PutMapping("/{id}")
-    public ResponseEntity<Simulation> updateSimulation(@PathVariable Integer id, @RequestBody Simulation details) {
-        try {
-            Simulation updatedSimulation = simulationService.updateSimulation(id, details);
-            return ResponseEntity.ok(updatedSimulation);
-        } catch (RuntimeException e) {
-            logger.warn("UPDATE REJETÉ (400) - ID: {} | Erreur: {}", id, e.getMessage());
-// === CORRECTION : 400 pour erreur logique, 404 seulement si non trouvée ===
-            if (e.getMessage().contains("non trouvée")) {
-                return ResponseEntity.status(404).body(null);
-            } else {
-                return ResponseEntity.status(400).body(null); // Erreur de validation
-            }        }
-    }
-*/
-@PutMapping("/{id}")
+
+/*@PutMapping("/{id}")
 public ResponseEntity<Simulation> updateSimulation(@PathVariable Integer id, @RequestBody Simulation details) {
     try {
         Simulation updatedSimulation = simulationService.updateSimulation(id, details);
@@ -98,7 +89,28 @@ public ResponseEntity<Simulation> updateSimulation(@PathVariable Integer id, @Re
         } catch (RuntimeException e) {
             return ResponseEntity.status(404).body(Map.of("error", e.getMessage(), "tempsRestant", 0, "fini", true));
         }
+    }*/
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateSimulation(@PathVariable Integer id, @RequestBody Simulation details) {
+        try {
+            Simulation updated = simulationService.updateSimulation(id, details);
+            return ResponseEntity.ok(updated);
+        } catch (RuntimeException e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Mise à jour impossible");
+            error.put("message", e.getMessage());
+
+            if (e.getMessage().contains("non trouvée")) {
+                return ResponseEntity.status(404).body(error);
+            } else {
+                return ResponseEntity.status(400).body(error);
+            }
+        }
     }
+
+
+
     // === FIN AJOUT ===
     // Démarrer une simulation
     @PostMapping("/{id}/start")
@@ -173,5 +185,53 @@ public ResponseEntity<Simulation> updateSimulation(@PathVariable Integer id, @Re
         } catch (Exception e) {
             logger.error("💥 Erreur: {}", e.getMessage());
             return ResponseEntity.internalServerError().body(List.of());
+        }
+    }
+    @GetMapping("/{id}/historique")
+    public ResponseEntity<List<Map<String, Object>>> getHistorique(@PathVariable Integer id) {
+        Simulation sim = simulationService.getSimulationById(id);
+        try {
+            List<Map<String, Object>> historique = new ObjectMapper().readValue(sim.getHistoriqueTrades(), List.class);
+            return ResponseEntity.ok(historique);
+        } catch (Exception e) {
+            return ResponseEntity.ok(new ArrayList<>());
+        }
+    }
+    // ===================================================================
+    // GARCH LIVE – UNIQUEMENT POUR LE JOUEUR (l'IA ne voit RIEN)
+    // ===================================================================
+    @GetMapping("/{id}/garch-live")
+    public ResponseEntity<Map<String, Object>> getGarchLiveForPlayer(@PathVariable Integer id) {
+        try {
+            Simulation sim = simulationService.getSimulationById(id);
+
+            // ← LIGNE CORRIGÉE – NOM EXACT QUI EXISTE DANS LE SERVICE
+            simulationService.refreshGarchLiveForSimulation(sim);
+
+            Map<String, Object> garchLive;
+            try {
+                garchLive = mapper.readValue(sim.getGarchLivePrediction(), new TypeReference<>() {});
+            } catch (Exception e) {
+                garchLive = Map.of("best_signal", Map.of("raison", "Analyse en cours..."));
+            }
+
+            Map<String, Object> signal = (Map<String, Object>) ((Map<?, ?>) garchLive.getOrDefault("best_signal", Map.of()));
+
+            Map<String, Object> response = Map.of(
+                    "visible", true,
+                    "titre", "TON AVANTAGE SECRET GARCH (l'IA ne voit PAS ça !)",
+                    "marche", sim.getMarketType().name().replace("_", " "),
+                    "meilleur_actif", signal.getOrDefault("symbol", "N/A"),
+                    "prix_actuel", signal.getOrDefault("price", "?"),
+                    "variation", signal.getOrDefault("change", "0%"),
+                    "prediction", " " + signal.getOrDefault("prediction", "NEUTRE") + " " + signal.getOrDefault("force", ""),
+                    "conseil_secret", signal.getOrDefault("conseil", "Observe le marché"),
+                    "update", LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")),
+                    "message", "Utilise ce super pouvoir pour écraser l’IA "
+            );
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.ok(Map.of("visible", false, "message", "GARCH indisponible"));
         }
     }}

@@ -1,10 +1,13 @@
 package com.demo.demo.serviceimplement;
-
+import static com.demo.demo.config.Config.*;
+import static com.demo.demo.entities.MarketType.TECH;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.demo.demo.config.Config;
+import com.demo.demo.entities.MarketType;
 import com.demo.demo.entities.ModeSimulation;
 import com.demo.demo.entities.Simulation;
 import com.demo.demo.entities.StatutSimulation;
-import com.demo.demo.entities.typeSimulation;
 import com.demo.demo.repository.SimulationRepository;
 import com.demo.demo.services.SimulationService;
 import com.demo.demo.services.TradingAgentService;
@@ -50,42 +53,76 @@ public class SimulationServiceImpl implements SimulationService {
     private String exportDir; // Dossier export CSV (équiv. Config.EXPORT_DIR)
     private final ObjectMapper mapper = new ObjectMapper();  // FIX : Mapper partagé (efficace)
 
-
     @Override
     public Simulation createSimulation(Simulation simulation) {
-        // (Code inchangé)
+        // Capital obligatoire
         if (simulation.getCapital() == null || simulation.getCapital() <= 0) {
             throw new RuntimeException("Le capital doit être positif");
         }
-        Optional<Simulation> existingSimulation = simulationRepository.findByTypeSimulationAndDescriptionAndDateDebut(
-                simulation.getTypeSimulation(), simulation.getDescription(), simulation.getDateDebut());
-        if (existingSimulation.isPresent()) {
-            throw new RuntimeException("Une simulation avec le même type, description et date de début existe déjà : ID = " + existingSimulation.get().getId());
+
+        // MarketType obligatoire
+        if (simulation.getMarketType() == null) {
+            throw new RuntimeException("marketType obligatoire (FOREX, TECH, ENERGIE, etc.)");
         }
-        if (simulation.getStatutSimulation() == null) {
-            simulation.setStatutSimulation(StatutSimulation.EN_ATTENTE);
+
+        // Description obligatoire
+        if (simulation.getDescription() == null || simulation.getDescription().trim().isEmpty()) {
+            throw new RuntimeException("La description de la salle est obligatoire");
         }
-        simulation.setDateDebut(null);
-        simulation.setDateFin(null);
-        simulation.setGainTotal(0.0f);
+        simulation.setDescription(simulation.getDescription().trim());
+
+        // Mode par défaut
+        if (simulation.getModeSimulation() == null) {
+            simulation.setModeSimulation(ModeSimulation.MONOJOUEUR);
+        }
+
+        // Durée par défaut
+        if (simulation.getDureeJeuMinutes() == null || simulation.getDureeJeuMinutes() < 1) {
+            simulation.setDureeJeuMinutes(3);
+        }
+
+        // Assets autorisés
+        if (simulation.getAllowedAssets() == null || simulation.getAllowedAssets().trim().isEmpty()) {
+            simulation.setAllowedAssets("ALL");
+        }
+
+        // Actif courant auto
+        if (simulation.getCurrentAsset() == null || simulation.getCurrentAsset().trim().isEmpty()) {
+            simulation.setCurrentAsset(getDefaultHotAsset(simulation.getMarketType()));
+        }
+
         simulation.setCapitalActuel(simulation.getCapital());
-        simulation.setFacteurTempsEcoule(0.0f);
-        simulation.setAnalyseResultats("{}");
+        simulation.setStatutSimulation(StatutSimulation.EN_ATTENTE);
+        simulation.setIaAdversaireActive(false);
+        simulation.setScoreIaVsUser(0.0f);
         simulation.setHistoriqueTrades("[]");
-        simulation.setIaAdversaireActive(false);  // FIX : Init false pour éviter null
-        // === AJOUT : GESTION DE LA DURÉE DU MATCH (dureeJeuMinutes) ===
-        // Si pas renseigné ou valeur invalide → 3 min par défaut
-        Integer duree = simulation.getDureeJeuMinutes();
-        if (duree == null || duree < 1 || duree > 30) {
-            simulation.setDureeJeuMinutes(3); // 3 min = valeur sûre et fun
-            logger.info("Durée du match non valide ou absente → 3 min par défaut");
-        } else {
-            logger.info("Durée du match définie à {} minute(s)", duree);
-        }
-        // === FIN AJOUT ===
+        simulation.setAnalyseResultats("{}");
+        simulation.setDernierTradeIa("{}");
+
         return simulationRepository.save(simulation);
     }
+    private String getDefaultHotAsset(MarketType marketType) {
+        return switch (marketType) {
+            case TECH -> getRandomFrom(TECH_SYMBOLS);
+            case ENERGIE -> getRandomFrom(ENERGY_SYMBOLS);
+            case MATIERE_PREMIERE -> getRandomFrom(COMMODITY_SYMBOLS); // "GC" propre
+            case IMMOBILIER -> getRandomFrom(REAL_ESTATE_SYMBOLS);
+            case FOREX -> getRandomFrom(PAIRS);
+        };
+    }
+    private String getRandomFrom(List<String> list) {
+        if (list == null || list.isEmpty()) return "EURUSD=X";
+        Random rand = new Random();
+        return list.get(rand.nextInt(list.size()));
+    }
 
+    private String getRandomFrom(List<String> list, String... priorities) {
+        Random rand = new Random();
+        if (!list.isEmpty() && rand.nextDouble() < 0.7 && priorities.length > 0) {
+            return priorities[rand.nextInt(priorities.length)];
+        }
+        return getRandomFrom(list);
+    }
 
     @Override
     public Simulation getSimulationById(Integer id) {
@@ -116,142 +153,179 @@ public class SimulationServiceImpl implements SimulationService {
     public List<Simulation> getAllSimulations() {
         return simulationRepository.findAll();
     }
-/*
+
     @Override
     public Simulation updateSimulation(Integer id, Simulation details) {
         Simulation simulation = simulationRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Simulation non trouvée avec ID : " + id));
-        // === AJOUT : INTERDIRE MODIF SI DÉJÀ DÉMARRÉE OU TERMINÉE + LOG ===
-        if (simulation.getStatutSimulation() == StatutSimulation.EXECUTEE ||
-                simulation.getStatutSimulation() == StatutSimulation.TERMINEE) {
 
-            String message = "Impossible de modifier une simulation déjà démarrée ou terminée (ID: " + id + ")";
-            logger.warn(message); // ← LOG EN WARN
-            throw new RuntimeException(message); // ← 400 + message clair
-
+        // SEULEMENT modifiable si EN_ATTENTE
+        if (simulation.getStatutSimulation() != StatutSimulation.EN_ATTENTE) {
+            throw new RuntimeException("Modification impossible : la simulation n'est plus en attente (statut actuel : " + simulation.getStatutSimulation() + ")");
         }
-        if (details.getDescription() != null) simulation.setDescription(details.getDescription());
-        if (details.getDuration() != null) simulation.setDuration(details.getDuration());
-        if (details.getDifficulte() != null) simulation.setDifficulte(details.getDifficulte());
-        if (details.getCapital() != null && details.getCapital() > 0) simulation.setCapital(details.getCapital());
-        if (details.getVitesseExecution() != null) simulation.setVitesseExecution(details.getVitesseExecution());
-        if (details.getVolatiliteMarche() != null) simulation.setVolatiliteMarche(details.getVolatiliteMarche());
-        if (details.getVolumeEchange() != null) simulation.setVolumeEchange(details.getVolumeEchange());
-        if (details.getRegleSimulation() != null) simulation.setRegleSimulation(details.getRegleSimulation());
-        if (details.getModeSimulation() != null) simulation.setModeSimulation(details.getModeSimulation());
-        if (details.getRisqueMaxAcceptable() != null) simulation.setRisqueMaxAcceptable(details.getRisqueMaxAcceptable());
-        if (details.getCapitalParUser() != null) simulation.setCapitalParUser(details.getCapitalParUser());
-        // === AJOUT : MODIFIER LA DURÉE DU MATCH (UNIQUEMENT EN ATTENTE) ===
-        if (details.getDureeJeuMinutes() != null) {
-            Integer duree = details.getDureeJeuMinutes();
-            if (duree < 1 || duree > 30) {
-                throw new RuntimeException("La durée du jeu doit être entre 1 et 30 minutes");
+
+        // === TOUT EST AUTORISÉ TANT QUE C'EST EN_ATTENTE ===
+
+        // Description (obligatoire et nettoyée)
+        if (details.getDescription() != null) {
+            if (details.getDescription().trim().isEmpty()) {
+                throw new RuntimeException("La description ne peut pas être vide");
             }
-            simulation.setDureeJeuMinutes(duree);
-            logger.info("Durée du match mise à jour : {} min pour simulation #{}", duree, id);
+            simulation.setDescription(details.getDescription().trim());
         }
-        // === FIN AJOUT ===
 
-        if (details.getStatutSimulation() != null) {
-            simulation.setStatutSimulation(details.getStatutSimulation());
+        // Capital
+        if (details.getCapital() != null) {
+            if (details.getCapital() <= 0) {
+                throw new RuntimeException("Le capital doit être positif");
+            }
+            simulation.setCapital(details.getCapital());
+            simulation.setCapitalActuel(details.getCapital());
+        }
+
+        // Durée du match
+        if (details.getDureeJeuMinutes() != null) {
+            if (details.getDureeJeuMinutes() < 1 || details.getDureeJeuMinutes() > 30) {
+                throw new RuntimeException("La durée doit être entre 1 et 30 minutes");
+            }
+            simulation.setDureeJeuMinutes(details.getDureeJeuMinutes());
+        }
+
+        // Changement de marché → on change l'actif par défaut
+        if (details.getMarketType() != null) {
+            simulation.setMarketType(details.getMarketType());
+            simulation.setCurrentAsset(getDefaultHotAsset(details.getMarketType()));
+        }
+
+        // Forcer un actif spécifique
+        if (details.getCurrentAsset() != null && !details.getCurrentAsset().trim().isEmpty()) {
+            simulation.setCurrentAsset(details.getCurrentAsset().toUpperCase().trim());
+        }
+
+        // Liste d'actifs autorisés
+        if (details.getAllowedAssets() != null && !details.getAllowedAssets().trim().isEmpty()) {
+            simulation.setAllowedAssets(details.getAllowedAssets().toUpperCase().trim());
         }
 
         return simulationRepository.save(simulation);
-    }*/
-@Override
-public Simulation updateSimulation(Integer id, Simulation details) {
-    Simulation simulation = simulationRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Simulation non trouvée avec ID : " + id));
-
-    // === AJOUT : INTERDIRE MODIF SI DÉJÀ DÉMARRÉE OU TERMINÉE + LOG ===
-    if (simulation.getStatutSimulation() == StatutSimulation.EXECUTEE || simulation.getStatutSimulation() == StatutSimulation.TERMINEE) {
-        String message = "Impossible de modifier une simulation déjà démarrée ou terminée (ID: " + id + ")";
-        logger.warn(message); // ← LOG EN WARN
-        throw new RuntimeException(message); // ← 400 + message clair
     }
 
-    if (details.getDescription() != null) simulation.setDescription(details.getDescription());
-    if (details.getDuration() != null) simulation.setDuration(details.getDuration());
-    if (details.getDifficulte() != null) simulation.setDifficulte(details.getDifficulte());
-    if (details.getCapital() != null && details.getCapital() > 0) simulation.setCapital(details.getCapital());
-    if (details.getVitesseExecution() != null) simulation.setVitesseExecution(details.getVitesseExecution());
-    if (details.getVolatiliteMarche() != null) simulation.setVolatiliteMarche(details.getVolatiliteMarche());
-    if (details.getVolumeEchange() != null) simulation.setVolumeEchange(details.getVolumeEchange());
-    if (details.getRegleSimulation() != null) simulation.setRegleSimulation(details.getRegleSimulation());
-    if (details.getModeSimulation() != null) simulation.setModeSimulation(details.getModeSimulation());
-    if (details.getRisqueMaxAcceptable() != null) simulation.setRisqueMaxAcceptable(details.getRisqueMaxAcceptable());
-    if (details.getCapitalParUser() != null) simulation.setCapitalParUser(details.getCapitalParUser());
-
-    // === AJOUT : MODIFIER LA DURÉE DU MATCH (UNIQUEMENT EN ATTENTE) ===
-    if (details.getDureeJeuMinutes() != null) {
-        Integer duree = details.getDureeJeuMinutes();
-        if (duree < 1 || duree > 30) {
-            throw new RuntimeException("La durée du jeu doit être entre 1 et 30 minutes");
-        }
-        simulation.setDureeJeuMinutes(duree);
-        logger.info("Durée du match mise à jour : {} min pour simulation #{}", duree, id);
-    }
-    // === FIN AJOUT ===
-
-    // === AJOUT : MODIFIER TYPESIMULATION (UNIQUEMENT EN ATTENTE) ===
-    if (details.getTypeSimulation() != null) {
-        typeSimulation newType = details.getTypeSimulation(); // Assume enum ou String valide
-        // Validation simple : Vérifie enum valide (adapte si String)
-        try {
-            typeSimulation validatedType = typeSimulation.valueOf(newType.name()); // Force validation enum
-            simulation.setTypeSimulation(validatedType);
-            logger.info("TypeSimulation mise à jour : {} pour simulation #{}", validatedType, id);
-        } catch (IllegalArgumentException e) {
-            throw new RuntimeException("TypeSimulation invalide : " + newType +
-                    ". Valeurs autorisées : CRASH, ACHAT_Massif, EVENT, EVENT_HISTORIQUE, FOREX");
-        }
-    }
-    // === FIN AJOUT ===
-
-    if (details.getStatutSimulation() != null) {
-        simulation.setStatutSimulation(details.getStatutSimulation());
-    }
-
-    return simulationRepository.save(simulation);
-}
 
     @Override
     public void deleteSimulation(Integer id) {
         logger.info("Tentative de suppression de l'ID : {}", id);
         simulationRepository.deleteById(id);
     }
- @Override
+  /// ///////////////////////////////////////////////////////////////////////
+    @Override
     public Simulation startSimulation(Integer id) {
         Simulation simulation = simulationRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Simulation non trouvée avec ID : " + id));
-        // AJOUT : Log + normalise (pour debug/mismatch)
-        String statutStr = simulation.getStatutSimulation() != null ? simulation.getStatutSimulation().name() : "NULL";
-        logger.info("START DEBUG - ID: {}, Statut: '{}'", id, statutStr);
+                .orElseThrow(() -> new RuntimeException("Simulation non trouvée"));
+
         if (simulation.getStatutSimulation() != StatutSimulation.EN_ATTENTE) {
-            logger.warn("START REJETÉ - ID: {}, Statut: {} (doit être EN_ATTENTE)", id, statutStr);
             throw new RuntimeException("La simulation doit être en attente pour démarrer");
         }
-        // === AJOUT : CALCUL DE LA FIN DU MATCH ===
-        Integer dureeMinutes = simulation.getDureeJeuMinutes(); // 3 si absent
+
+        Integer dureeMinutes = simulation.getDureeJeuMinutes();
         LocalDateTime debut = LocalDateTime.now();
         simulation.setDateDebut(debut);
-        simulation.setDateFin(debut.plusMinutes(dureeMinutes)); // ← FIN À +3 min
-        simulation.setTempsRestantSecondes(dureeMinutes * 60); // 180s
-        logger.info("Match démarré : {} min → fin à {}", dureeMinutes, simulation.getDateFin());
-        // === FIN AJOUT ===
+        simulation.setDateFin(debut.plusMinutes(dureeMinutes));
+        simulation.setTempsRestantSecondes(dureeMinutes * 60);
+
         simulation.setStatutSimulation(StatutSimulation.EXECUTEE);
-        simulation.setDateDebut(LocalDateTime.now());
-        runForexAnalysisInSimulation(id);//intiale
-        // FIX : Active IA si MONO
+
+        // Lancement du GARCH live pour cette salle
+        refreshGarchLiveForSimulation(simulation);
+        simulation.setGarchLastUpdate(LocalDateTime.now());
+
+        runForexAnalysisInSimulation(id);
+
         if (simulation.getModeSimulation() == ModeSimulation.MONOJOUEUR) {
             tradingAgentService.activateIaAdversaire(id);
-            logger.info("🤖 IA Adversaire activée pour simu MONO #{}", id);
         }
-        logger.info("START OK - ID: {}, Tout lancé (temps: {}, IA: {})", id, simulation.getTempsRestantSecondes(), simulation.getIaAdversaireActive());
+
         return simulationRepository.save(simulation);
     }
 
+    // ===================================================================
+    // GARCH LIVE POUR LE JOUEUR UNIQUEMENT
+    // ===================================================================
 
+    @Scheduled(fixedRate = 30000) // Toutes les 30 secondes
+    public void refreshAllGarchLive() {
+        List<Simulation> active = simulationRepository.findByStatutSimulation(StatutSimulation.EXECUTEE);
+        LocalDateTime now = LocalDateTime.now();
+
+        for (Simulation sim : active) {
+            if (sim.getGarchLastUpdate() == null || Duration.between(sim.getGarchLastUpdate(), now).getSeconds() > 25) {
+                refreshGarchLiveForSimulation(sim);
+                sim.setGarchLastUpdate(now);
+                simulationRepository.save(sim);
+            }
+        }
+    }
+    public void refreshGarchLiveForSimulation(Simulation sim) {
+        MarketType market = sim.getMarketType();
+        List<String> symbols = switch (market) {
+            case FOREX -> Config.PAIRS;
+            case TECH -> Config.TECH_SYMBOLS;
+            case ENERGIE -> Config.ENERGY_SYMBOLS;
+            case MATIERE_PREMIERE -> Config.COMMODITY_SYMBOLS.stream().map(s -> s + "=F").toList();
+            case IMMOBILIER -> Config.REAL_ESTATE_SYMBOLS;
+        };
+
+        Map<String, Object> bestSignal = Map.of("raison", "Analyse en cours...");
+        double bestScore = 0;
+
+        for (String symbol : symbols) {
+            try {
+                List<Map<String, Object>> data = getData(symbol, "1h");
+                if (data == null || data.size() < 25) continue;
+
+                double[] closes = data.stream().mapToDouble(r -> (Double) r.get("Close")).toArray();
+                double price = closes[closes.length - 1];
+                double prev = closes[closes.length - 2];
+                double change = (price - prev) / prev * 100;
+                double volScore = assessVolatility(closes);
+
+                double ema10 = calculateEMA(closes, 10);
+                double ema30 = calculateEMA(closes, 30);
+                boolean bullish = price > ema10 && ema10 > ema30;
+
+                String pred = bullish ? "HAUSSIER" : "BAISSIER";
+                String force = volScore > 0.7 ? "TRÈS FORTE" : volScore < 0.4 ? "FAIBLE" : "MODÉRÉE";
+
+                String raison = String.format("%s %.2f$ (%+.2f%%) → %s %s",
+                        symbol.replace("=F", ""), price, change, pred, force);
+
+                double score = bullish ? volScore : (1 - volScore);
+                if (score > bestScore) {
+                    bestScore = score;
+                    bestSignal = Map.of(
+                            "symbol", symbol.replace("=F", ""),
+                            "price", String.format("%.2f", price),
+                            "change", String.format("%+.2f%%", change),
+                            "prediction", pred,
+                            "force", force,
+                            "conseil", bullish ? "ACHAT recommandé" : "VENTE ou ATTENDRE",
+                            "raison", raison
+                    );
+                }
+            } catch (Exception ignored) {}
+        }
+
+        Map<String, Object> garchJson = Map.of(
+                "market", market.name(),
+                "best_signal", bestSignal,
+                "update", LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"))
+        );
+
+        try {
+            sim.setGarchLivePrediction(mapper.writeValueAsString(garchJson));
+        } catch (Exception e) {
+            sim.setGarchLivePrediction("{}");
+        }
+    }
     @Override
     public Simulation endSimulation(Integer id) {
         Simulation sim = getSimulationById(id); // Utilise la version corrigée
@@ -274,64 +348,94 @@ public Simulation updateSimulation(Integer id, Simulation details) {
     @Override
     public String getRealTimeIaResponse(Integer simulationId, String userTrade, String asset) {
         return tradingAgentService.getRealTimeIaResponse(simulationId, userTrade, asset);    }
+/*
+// FIX : Tour humain vs IA - VERSION FINALE RÉELLE
+@Override
+public Map<String, Object> playIaMove(Integer simulationId, Map<String, Object> humanTrade) {
+    Simulation sim = simulationRepository.findById(simulationId).orElseThrow();
 
-    // FIX : Tour humain vs IA
-    @Override
-    public Map<String, Object> playIaMove(Integer simulationId, Map<String, Object> humanTrade) {
-        Simulation sim = simulationRepository.findById(simulationId).orElseThrow();
-        // === AJOUT : VÉRIFIE TEMPS VIA NOUVELLE MÉTHODE (auto-fin) ===
-        Map<String, Object> tempsInfo = getUpdatedTempsRestant(simulationId);
-        if ((Boolean) tempsInfo.get("fini")) {
-            throw new RuntimeException("TEMPS ÉCOULÉ ! Le match est terminé.");
-        }
-// Mise à jour du temps restant (déjà gérée dans getUpdated)
-        int tempsActuel = (Integer) tempsInfo.get("tempsRestant");
-        sim.setTempsRestantSecondes(tempsActuel); // Sync DB si besoin (redondant mais safe)
-        // === FIN AJOUT ===
-        if (Boolean.FALSE.equals(Optional.ofNullable(sim.getIaAdversaireActive()).orElse(false)) || sim.getModeSimulation() != ModeSimulation.MONOJOUEUR) {  // FIX : Null-safe Boolean.FALSE.equals + orElse(false)
-            throw new RuntimeException("IA adversaire non active (mode MONOJOUEUR seulement)");
+    // === VÉRIFIE TEMPS VIA NOUVELLE MÉTHODE (auto-fin) ===
+    Map<String, Object> tempsInfo = getUpdatedTempsRestant(simulationId);
+    if ((Boolean) tempsInfo.get("fini")) {
+        throw new RuntimeException("TEMPS ÉCOULÉ ! Le match est terminé.");
+    }
+    int tempsActuel = (Integer) tempsInfo.get("tempsRestant");
+    sim.setTempsRestantSecondes(tempsActuel);
 
-        }
-        String asset = (String) humanTrade.get("asset");
-        String userTradeJson = null;
-        try {
-            userTradeJson = mapper.writeValueAsString(humanTrade);
-        } catch (JsonProcessingException e) {
-            logger.error("JSON write error for humanTrade: {}", e.getMessage());
-            throw new RuntimeException("Invalid human trade JSON");
-        }
-        String iaResponse = tradingAgentService.getRealTimeIaResponse(simulationId, userTradeJson, asset);
-        Map<String, Object> iaTrade = null;
-        try {
-            iaTrade = mapper.readValue(iaResponse, Map.class);
-        } catch (JsonProcessingException e) {
-            logger.error("JSON parse error for IA response: {}", e.getMessage());
-            iaTrade = fallbackIaTrade();
-        }
-        Float pnlHuman = (float) (Math.random() * 100 - 50);
-        tradingAgentService.updateScoreIaVsUser(simulationId, pnlHuman);
-        List<Map<String, Object>> historique = null;
-        try {
-            historique = mapper.readValue(sim.getHistoriqueTrades(), List.class);
-        } catch (JsonProcessingException e) {
-            logger.error("Historique parse error: {}", e.getMessage());
-            historique = new ArrayList<>();  // Fallback empty
-        }
-        Map<String, Object> tour = Map.of("tour", historique.size() + 1, "human", humanTrade, "ia", iaTrade);
-        historique.add(tour);
-        try {
-            sim.setHistoriqueTrades(mapper.writeValueAsString(historique));
-        } catch (JsonProcessingException e) {
-            logger.error("Historique write error: {}", e.getMessage());
-            sim.setHistoriqueTrades("[]");
-        }
-        simulationRepository.save(sim);
-        Map<String, Object> response = new HashMap<>();
-        response.put("tour", tour);
-        response.put("scoreIaVsUser", sim.getScoreIaVsUser());
-        return response;
+    // === VÉRIFIE IA ACTIVE ===
+    if (Boolean.FALSE.equals(Optional.ofNullable(sim.getIaAdversaireActive()).orElse(false))
+            || sim.getModeSimulation() != ModeSimulation.MONOJOUEUR) {
+        throw new RuntimeException("IA adversaire non active (mode MONOJOUEUR seulement)");
     }
 
+    String asset = (String) humanTrade.get("asset");
+
+    // === TRADE HUMAIN → JSON pour Gemini ===
+    String userTradeJson;
+    try {
+        userTradeJson = mapper.writeValueAsString(humanTrade);
+    } catch (JsonProcessingException e) {
+        logger.error("JSON write error for humanTrade: {}", e.getMessage());
+        throw new RuntimeException("Invalid human trade JSON");
+    }
+
+    // === APPEL À GEMINI ===
+    String iaResponse = tradingAgentService.getRealTimeIaResponse(simulationId, userTradeJson, asset);
+
+    // === PARSE RÉPONSE IA ===
+    Map<String, Object> iaTrade;
+    try {
+        iaTrade = mapper.readValue(iaResponse, Map.class);
+    } catch (JsonProcessingException e) {
+        logger.error("JSON parse error for IA response: {}", e.getMessage());
+        iaTrade = fallbackIaTrade();
+    }
+
+    // === AJOUT CRUCIAL : on garde l'asset pour le calcul du score réel ===
+    iaTrade.put("asset", asset);
+    try {
+        sim.setDernierTradeIa(mapper.writeValueAsString(iaTrade));
+    } catch (JsonProcessingException e) {
+        sim.setDernierTradeIa("{}");
+    }
+    simulationRepository.save(sim);
+    // === FIN AJOUT CRUCIAL ===
+
+    // === PnL Humain (tu peux le rendre réel plus tard si tu veux) ===
+    Float pnlHuman = (float) (Math.random() * 100 - 50);
+
+    // === MISE À JOUR DU SCORE RÉEL (utilise le prix live Yahoo) ===
+    tradingAgentService.updateScoreIaVsUser(simulationId, pnlHuman);
+
+    // === HISTORIQUE DES TOURS ===
+    List<Map<String, Object>> historique;
+    try {
+        historique = mapper.readValue(sim.getHistoriqueTrades(), List.class);
+    } catch (JsonProcessingException e) {
+        historique = new ArrayList<>();
+    }
+
+    Map<String, Object> tour = Map.of(
+            "tour", historique.size() + 1,
+            "human", humanTrade,
+            "ia", iaTrade
+    );
+    historique.add(tour);
+
+    try {
+        sim.setHistoriqueTrades(mapper.writeValueAsString(historique));
+    } catch (JsonProcessingException e) {
+        sim.setHistoriqueTrades("[]");
+    }
+    simulationRepository.save(sim);
+
+    // === RÉPONSE AU FRONT ===
+    Map<String, Object> response = new HashMap<>();
+    response.put("tour", tour);
+    response.put("scoreIaVsUser", sim.getScoreIaVsUser());
+
+    return response;
+}
     private Map<String, Object> fallbackIaTrade() {
         return Map.of(
                 "tradeType", "ACHAT",
@@ -341,7 +445,168 @@ public Simulation updateSimulation(Integer id, Simulation details) {
                 "takeProfit", 1.09,
                 "reason", "Fallback : Contre-trade basique (risque 2%)"
         );}
+*/
+@Override
+public Map<String, Object> playIaMove(Integer simulationId, Map<String, Object> humanTrade) {
+    Simulation sim = simulationRepository.findById(simulationId)
+            .orElseThrow(() -> new RuntimeException("Simulation non trouvée"));
 
+    // === 1. GESTION DU TEMPS ===
+    Map<String, Object> tempsInfo = getUpdatedTempsRestant(simulationId);
+    if (Boolean.TRUE.equals(tempsInfo.get("fini"))) {
+        throw new RuntimeException("⏰ TEMPS ÉCOULÉ ! Le match est terminé.");
+    }
+    int tempsRestant = (Integer) tempsInfo.get("tempsRestant");
+    sim.setTempsRestantSecondes(tempsRestant);
+
+    // === 2. VÉRIF MODE + IA ACTIVE ===
+    if (!ModeSimulation.MONOJOUEUR.equals(sim.getModeSimulation()) ||
+            Boolean.FALSE.equals(Optional.ofNullable(sim.getIaAdversaireActive()).orElse(false))) {
+        throw new RuntimeException("Mode IA adversaire non activé");
+    }
+
+    String asset = (String) humanTrade.get("asset");
+
+    // === 3. GEMINI – PROMPT CLASSIQUE (l'IA ne voit PAS GARCH) ===
+    String iaResponseJson;
+    try {
+        String humanTradeJson = mapper.writeValueAsString(humanTrade);
+        iaResponseJson = tradingAgentService.getRealTimeIaResponse(simulationId, humanTradeJson, asset);
+    } catch (JsonProcessingException e) {
+        throw new RuntimeException("Erreur sérialisation trade humain");
+    }
+
+    // === 4. PARSE RÉPONSE IA + FALLBACK ===
+    Map<String, Object> iaTrade;
+    try {
+        iaTrade = mapper.readValue(iaResponseJson, new TypeReference<Map<String, Object>>() {});
+    } catch (Exception e) {
+        logger.warn("Gemini réponse invalide → fallback activé");
+        iaTrade = fallbackIaTrade();
+    }
+    iaTrade.put("asset", asset);
+
+    try {
+        sim.setDernierTradeIa(mapper.writeValueAsString(iaTrade));
+    } catch (JsonProcessingException e) {
+        sim.setDernierTradeIa("{}");
+    }
+
+    // === 5. PRIX LIVE + CALCUL PnL RÉELS ===
+    Map<String, Object> livePrices = getYahooLivePrices();
+    double prixActuel = 145.0; // fallback safe
+    if (livePrices.containsKey(asset)) {
+        prixActuel = ((Number) ((Map<?, ?>) livePrices.get(asset)).get("price")).doubleValue();
+    }
+
+    // PnL Humain
+    String typeHuman = (String) humanTrade.get("type");
+    double prixHuman = ((Number) humanTrade.get("prix")).doubleValue();
+    double qtyHuman = ((Number) humanTrade.get("quantite")).doubleValue();
+    double pnlHumanTour = "ACHAT".equalsIgnoreCase(typeHuman)
+            ? (prixActuel - prixHuman) * qtyHuman
+            : (prixHuman - prixActuel) * qtyHuman;
+
+    // PnL IA
+    String typeIa = (String) iaTrade.get("type");
+    double prixIa = ((Number) iaTrade.get("prix")).doubleValue();
+    double qtyIa = ((Number) iaTrade.get("quantite")).doubleValue();
+    double pnlIaTour = "ACHAT".equalsIgnoreCase(typeIa)
+            ? (prixActuel - prixIa) * qtyIa
+            : (prixIa - prixActuel) * qtyIa;
+
+    // === 6. SCORE GLOBAL ===
+    float ancienScore = sim.getScoreIaVsUser() != null ? sim.getScoreIaVsUser() : 0f;
+    float nouveauScore = ancienScore + (float) (pnlIaTour - pnlHumanTour);
+    sim.setScoreIaVsUser(nouveauScore);
+
+    // === 7. HISTORIQUE DES TOURS ===
+    List<Map<String, Object>> historique = new ArrayList<>();
+    try {
+        historique = mapper.readValue(sim.getHistoriqueTrades(), new TypeReference<List<Map<String, Object>>>() {});
+    } catch (Exception ignored) {}
+
+    Map<String, Object> tour = new LinkedHashMap<>();
+    tour.put("tour", historique.size() + 1);
+    tour.put("human", humanTrade);
+    tour.put("ia", iaTrade);
+    historique.add(tour);
+
+    try {
+        sim.setHistoriqueTrades(mapper.writeValueAsString(historique));
+    } catch (JsonProcessingException e) {
+        sim.setHistoriqueTrades("[]");
+    }
+
+    simulationRepository.save(sim);
+
+    // === 8. GARCH LIVE – UNIQUEMENT POUR LE JOUEUR (super pouvoir secret !) ===
+    Map<String, Object> garchPlayerPower = Map.of("visible", false);
+
+    if (sim.getGarchLivePrediction() != null && !sim.getGarchLivePrediction().equals("{}")) {
+        try {
+            Map<String, Object> live = mapper.readValue(sim.getGarchLivePrediction(), new TypeReference<>() {});
+            Map<String, Object> best = (Map<String, Object>) live.get("best_signal");
+
+            garchPlayerPower = Map.of(
+                    "visible", true,
+                    "titre", "🔥 TON AVANTAGE SECRET GARCH (l’IA est aveugle !)",
+                    "marche", sim.getMarketType().name(),
+                    "actif", best.getOrDefault("symbol", "N/A"),
+                    "prix", best.getOrDefault("price", "?"),
+                    "variation", best.getOrDefault("change", "0%"),
+                    "prediction", best.getOrDefault("prediction", "NEUTRE") + " " + best.getOrDefault("force", ""),
+                    "conseil", best.getOrDefault("conseil", "Observe..."),
+                    "update", live.getOrDefault("update", "N/A")
+            );
+        } catch (Exception ignored) {}
+    }
+
+    // === 9. RÉPONSE FRONT ===
+    String resultatTour = pnlHumanTour > 0
+            ? "🟢 TOUR GAGNANT ! +" + String.format("%.2f $", pnlHumanTour)
+            : pnlHumanTour < 0
+            ? "🔴 Tour perdu " + String.format("%.2f $", pnlHumanTour)
+            : "🟡 Tour neutre 0.00 $";
+
+    String leader = nouveauScore > 0
+            ? "🤖 IA devant de " + String.format("%.2f $", Math.abs(nouveauScore))
+            : nouveauScore < 0
+            ? "🚀💪 TU ES DEVANT de " + String.format("%.2f $", Math.abs(nouveauScore))
+            : "⚔️ ÉGALITÉ PARFAITE";
+
+    Map<String, Object> response = new HashMap<>();
+    response.put("tour", tour);
+    response.put("pnlTour", resultatTour);
+    response.put("pnlHuman", String.format("%.2f $", pnlHumanTour));
+    response.put("pnlIa", String.format("%.2f $", pnlIaTour));
+    response.put("scoreIaVsUser", nouveauScore);
+    response.put("leader", leader);
+    response.put("tempsRestantSecondes", tempsRestant);
+    response.put("garchPlayerPower", garchPlayerPower); // ← TON SUPER POUVOIR SECRET !
+
+    return response;
+}
+    // ===================================================================
+// FALLBACK (maintenant dans la même classe → plus d’erreur !)
+// ===================================================================
+    private Map<String, Object> fallbackIaTrade() {
+        Random r = new Random();
+        String type = r.nextBoolean() ? "ACHAT" : "VENTE";
+        double basePrice = 140 + r.nextDouble() * 20;
+        double qty = 50 + r.nextInt(500);
+        double sl = type.equals("ACHAT") ? basePrice * 0.97 : basePrice * 1.03;
+        double tp = type.equals("ACHAT") ? basePrice * 1.06 : basePrice * 0.94;
+
+        return Map.of(
+                "type", type,
+                "quantite", Math.round(qty),
+                "prix", Math.round(basePrice * 100.0) / 100.0,
+                "stopLoss", Math.round(sl * 100.0) / 100.0,
+                "takeProfit", Math.round(tp * 100.0) / 100.0,
+                "raison", "Fallback sécurisé : contre-trade conservateur"
+        );
+    }
     // (runForexAnalysisInSimulation, updateActiveSimulations, getData, cleanData, resampleTo4h, getFallbackData inchangées - copiez de précédent)
 
     @Override
@@ -422,29 +687,7 @@ public Simulation updateSimulation(Integer id, Simulation details) {
     @Override
     public List<Simulation> getSimulationsByStatus(StatutSimulation statut) {
         return simulationRepository.findByStatutSimulation(statut);    }
-/// //////////////////////deux api ensemble forex techniq____///////
-   /* @Override
-    public Map<String, Object> getYahooLivePrices() {
-        Map<String, Object> result = new HashMap<>();
-        for (String pair : Config.PAIRS) {
-            try {
-                List<Map<String, Object>> data = getData(pair, "1h");
-                if (!data.isEmpty()) {
-                    Map<String, Object> last = data.get(data.size() - 1);
-                    double close = (Double) last.get("Close");
-                    double open = (Double) data.get(0).get("Open");
-                    double changePct = ((close - open) / open) * 100;
-                    result.put(pair, Map.of("price", close, "changePct", changePct));
-                } else {
-                    result.put(pair, Map.of("price", 1.08, "changePct", 0.0));
-                }
-            } catch (Exception e) {
-                result.put(pair, Map.of("price", 1.08, "changePct", 0.0));
-            }
-        }
-        return result;
-    }*/
-// === REMPLACE getYahooLivePrices() PAR ÇA (TOUT ENSEMBLE) ===
+/*
 @Override
 public Map<String, Object> getYahooLivePrices() {
     Map<String, Object> result = new HashMap<>();
@@ -508,7 +751,78 @@ public Map<String, Object> getYahooLivePrices() {
     }
     return result;
 }
+*/
+@Override
+public Map<String, Object> getYahooLivePrices() {
+    Map<String, Object> result = new HashMap<>();
 
+    // ON CHARGE TOUS LES MARCHÉS POSSIBLES
+    Set<String> allSymbols = new HashSet<>();
+
+    // Forex (déjà avec =X)
+    allSymbols.addAll(Config.PAIRS);
+
+    // Tech
+    allSymbols.addAll(Config.TECH_SYMBOLS);
+
+    // Énergie
+    allSymbols.addAll(Config.ENERGY_SYMBOLS);
+
+    // Immobilier
+    allSymbols.addAll(Config.REAL_ESTATE_SYMBOLS);
+
+    // Matières premières : on ajoute =F automatiquement
+    for (String s : Config.COMMODITY_SYMBOLS) {
+        allSymbols.add(s + "=F");
+    }
+
+    for (String symbol : allSymbols) {
+        try {
+            String url = "https://query1.finance.yahoo.com/v8/finance/chart/" + symbol + "?range=1d&interval=1m";
+            logger.info("Yahoo → {}", url);
+
+            String jsonStr = restTemplate.getForObject(url, String.class);
+            if (jsonStr == null || jsonStr.trim().isEmpty()) {
+                result.put(symbol, Map.of("price", 0.0, "changePct", 0.0));
+                continue;
+            }
+
+            JsonNode root = mapper.readTree(jsonStr);
+            JsonNode chart = root.path("chart");
+            if (chart.isMissingNode()) {
+                result.put(symbol, Map.of("price", 0.0, "changePct", 0.0));
+                continue;
+            }
+
+            JsonNode resultNode = chart.path("result");
+            if (resultNode.isMissingNode() || resultNode.size() == 0) {
+                result.put(symbol, Map.of("price", 0.0, "changePct", 0.0));
+                continue;
+            }
+
+            JsonNode meta = resultNode.get(0).path("meta");
+            double price = meta.path("regularMarketPrice").asDouble(0.0);
+            double previousClose = meta.path("chartPreviousClose").asDouble(0.0);
+
+            if (price <= 0 || previousClose <= 0) {
+                result.put(symbol, Map.of("price", 0.0, "changePct", 0.0));
+                continue;
+            }
+
+            double changePct = ((price - previousClose) / previousClose) * 100;
+
+            result.put(symbol, Map.of(
+                    "price", round(price, symbol.contains("=X") ? 5 : 2),
+                    "changePct", round(changePct, 2)
+            ));
+
+        } catch (Exception e) {
+            logger.error("Exception Yahoo {}: {}", symbol, e.getMessage());
+            result.put(symbol, Map.of("price", 0.0, "changePct", 0.0));
+        }
+    }
+    return result;
+}
     @Override
     public List<Map<String, Object>> getYahooCandles(String pair) {
         try {
@@ -1107,22 +1421,33 @@ public Map<String, Object> getAlphaLivePrices() {
     @Override
     public Map<String, Object> getFinnhubLivePrices() {
         Map<String, Object> result = new HashMap<>();
-        for (String symbol : Config.ENERGY_SYMBOLS) {  // XOM, CVX, etc.
+
+        for (String symbol : Config.ENERGY_SYMBOLS) {
             try {
                 String url = String.format("https://finnhub.io/api/v1/quote?symbol=%s&token=%s", symbol, finhubKey);
                 String jsonStr = restTemplate.getForObject(url, String.class);
-                if (jsonStr != null && !jsonStr.contains("error")) {
+
+                if (jsonStr != null && !jsonStr.contains("error") && jsonStr.contains("\"c\":")) {
                     JsonNode root = mapper.readTree(jsonStr);
-                    double price = root.path("c").asDouble(0);  // Current price
-                    double open = root.path("o").asDouble(0);   // Open today
-                    double changePct = open > 0 ? root.path("pc").asDouble(0) : 0.0;  // % change (pré-calculé par Finnhub)
-                    result.put(symbol, Map.of("price", price, "changePct", changePct));
-                } else {
-                    result.put(symbol, Map.of("price", 80.0, "changePct", 0.0));  // Fallback énergie (~XOM)
+                    double price = root.path("c").asDouble(0);
+                    double changePct = root.path("pc").asDouble(0); // % change déjà calculé
+
+                    if (price > 0) {
+                        result.put(symbol, Map.of("price", price, "changePct", changePct));
+                        continue; // OK → on garde Finnhub
+                    }
                 }
             } catch (Exception e) {
-                logger.warn("Erreur Finnhub live pour {}: {}", symbol, e.getMessage());
-                result.put(symbol, Map.of("price", 80.0, "changePct", 0.0));
+                logger.warn("Finnhub échoué pour {} → bascule sur Yahoo", symbol);
+            }
+
+            // === BASCULE SUR YAHOO SI FINNHUB ÉCHOUE ===
+            try {
+                Map<String, Object> yahooPrices = getYahooLivePrices(); // réutilise ta méthode Yahoo
+                Map<String, Object> yahooData = (Map<String, Object>) yahooPrices.getOrDefault(symbol, Map.of("price", 0.0, "changePct", 0.0));
+                result.put(symbol, yahooData);
+            } catch (Exception ex) {
+                result.put(symbol, Map.of("price", 0.0, "changePct", 0.0));
             }
         }
         return result;
@@ -1131,20 +1456,22 @@ public Map<String, Object> getAlphaLivePrices() {
     @Override
     public List<Map<String, Object>> getFinnhubCandles(String symbol) {
         try {
-            long to = System.currentTimeMillis() / 1000;  // Unix now
-            long from = to - 300 * 60;  // 5 min ago (300s = 5min, resolution 1min)
+            long to = System.currentTimeMillis() / 1000;
+            long from = to - 300 * 60; // 5 min
             String url = String.format(
                     "https://finnhub.io/api/v1/stock/candle?symbol=%s&resolution=1&from=%d&to=%d&token=%s",
                     symbol, from, to, finhubKey
             );
             String jsonStr = restTemplate.getForObject(url, String.class);
+
             if (jsonStr != null && !jsonStr.contains("error")) {
                 JsonNode root = mapper.readTree(jsonStr);
-                int s = root.path("s").asInt();  // Status (0=OK)
-                if (s == 0) {
+                int s = root.path("s").asInt();
+                if (s == 0 && root.path("c").size() > 0) {
+                    // Finnhub OK → on renvoie ses candles
                     List<Map<String, Object>> data = new ArrayList<>();
-                    int count = root.path("t").size();  // Timestamps size
-                    int start = Math.max(0, count - 5);  // 5 dernières
+                    int count = root.path("t").size();
+                    int start = Math.max(0, count - 5);
                     for (int i = start; i < count; i++) {
                         Map<String, Object> candle = new HashMap<>();
                         candle.put("Open", root.path("o").get(i).asDouble(0));
@@ -1157,9 +1484,11 @@ public Map<String, Object> getAlphaLivePrices() {
                 }
             }
         } catch (Exception e) {
-            logger.warn("Erreur Finnhub candles pour {}: fallback", symbol);
+            logger.warn("Finnhub candles échoué pour {} → bascule sur Yahoo", symbol);
         }
-        return getFallbackEnergyCandles(symbol);
+
+        // === BASCULE SUR YAHOO ===
+        return getYahooCandles(symbol);
     }
 
     private List<Map<String, Object>> getFallbackEnergyCandles(String symbol) {

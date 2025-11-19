@@ -40,6 +40,5 @@ SimulationService {
     // NOUVEAU : Pour immobilier (Alpha Vantage, réutilise clé)
     Map<String, Object> getAlphaRealEstateLivePrices();  // Prix live + % change pour PLD/AMT/etc.
     List<Map<String, Object>> getAlphaRealEstateCandles(String symbol);  // 5 dernières candles 1min
-
-
+    void refreshGarchLiveForSimulation(Simulation simulation);
 }
